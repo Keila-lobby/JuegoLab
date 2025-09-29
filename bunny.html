@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Búsqueda del Conejo 🐇</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #388E3C;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f1f8e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .grade-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .grade-btn {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .grade-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .grade-btn.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .difficulty-info {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f1f8e9;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .camera-container {
+            width: 100%;
+            max-width: 640px;
+            height: 480px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 3px solid #4CAF50;
+        }
+        
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .object-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .object-item {
+            background-color: #f1f8e9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .object-item.found {
+            background-color: #C8E6C9;
+            text-decoration: line-through;
+            color: #388E3C;
+        }
+        
+        .object-item.current {
+            background-color: #FFEB3B;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #388E3C;
+            background-color: #f1f8e9;
+        }
+        
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .win-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .win-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .camera-container {
+                height: 360px;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .camera-container {
+                height: 280px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .object-icon {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Pantalla de selección de grado -->
+        <div id="grade-screen" class="screen active">
+            <header>
+                <h1>La Búsqueda del Conejo 🐇</h1>
+                <h2>Juego de Rapidez y Observación</h2>
+                <h3>Selecciona tu grado académico para comenzar</h3>
+            </header>
+
+            <div class="instructions">
+                <p>En este juego, deberás encontrar objetos específicos y mostrarlos frente a la cámara en el menor tiempo posible.</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Kínder:</strong> 5 objetos simples, 60 segundos</li>
+                    <li><strong>Primaria:</strong> 8 objetos, 45 segundos</li>
+                    <li><strong>Secundaria:</strong> 10 objetos, 30 segundos</li>
+                    <li><strong>Bachillerato:</strong> 12 objetos, 20 segundos</li>
+                </ul>
+                <p style="margin-top: 10px;">¡Entre más rápido encuentres los objetos, más puntos ganarás!</p>
+            </div>
+
+            <div class="grade-selector">
+                <button class="grade-btn active" data-grade="kinder">Kínder</button>
+                <button class="grade-btn" data-grade="primaria">Primaria</button>
+                <button class="grade-btn" data-grade="secundaria">Secundaria</button>
+                <button class="grade-btn" data-grade="bachillerato">Bachillerato</button>
+            </div>
+
+            <div class="difficulty-info" id="difficulty-info">
+                Nivel: Kínder - 5 objetos, 60 segundos
+            </div>
+
+            <div class="controls">
+                <button id="start-btn"><i class="fas fa-play"></i> Comenzar Juego</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+            </div>
+        </div>
+
+        <!-- Pantalla de juego -->
+        <div id="game-screen" class="screen">
+            <header>
+                <h1>La Búsqueda del Conejo 🐇</h1>
+                <h2 id="grade-title">Kínder</h2>
+                <h3 id="time-info">Tiempo restante: <span id="timer-display">60</span> segundos</h3>
+            </header>
+
+            <div class="instructions">
+                <p>Encuentra los objetos de la lista y muéstralos frente a la cámara. ¡Entre más rápido, más puntos!</p>
+            </div>
+
+            <div class="timer" id="timer">
+                60
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="game-area">
+                <div class="camera-container">
+                    <video id="camera-feed" autoplay playsinline></video>
+                    <div class="camera-overlay" id="camera-overlay">
+                        <div>
+                            <i class="fas fa-camera"></i><br> Cargando cámara...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="object-list" id="object-list">
+                    <!-- Los objetos a buscar se generarán aquí -->
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="found-count">0</div>
+                    <div>Objetos Encontrados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div>Puntuación</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time-left">60</div>
+                    <div>Segundos Restantes</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="start-camera-btn"><i class="fas fa-camera"></i> Activar Cámara</button>
+                <button id="restart-btn"><i class="fas fa-redo"></i> Reiniciar</button>
+                <button id="back-to-menu-btn"><i class="fas fa-arrow-left"></i> Volver</button>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="win-message" id="win-message">
+                <h3><i class="fas fa-trophy"></i> ¡Felicidades! Has encontrado todos los objetos</h3>
+                <p>Tu puntuación: <span id="final-score">0</span> puntos</p>
+                <p>Tiempo restante: <span id="final-time">0</span> segundos</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de dificultad por grado
+        const difficultySettings = {
+            kinder: {
+                name: "Kínder",
+                timeLimit: 60,
+                objects: 5,
+                objectsList: ["Lápiz", "Cuaderno", "Borrador", "Tijeras", "Pegamento"]
+            },
+            primaria: {
+                name: "Primaria",
+                timeLimit: 45,
+                objects: 8,
+                objectsList: ["Lápiz", "Cuaderno", "Borrador", "Tijeras", "Pegamento", "Regla", "Colores", "Calculadora"]
+            },
+            secundaria: {
+                name: "Secundaria",
+                timeLimit: 30,
+                objects: 10,
+                objectsList: ["Lápiz", "Cuaderno", "Borrador", "Tijeras", "Pegamento", "Regla", "Colores", "Calculadora", "Compás", "Transportador"]
+            },
+            bachillerato: {
+                name: "Bachillerato",
+                timeLimit: 20,
+                objects: 12,
+                objectsList: ["Lápiz", "Cuaderno", "Borrador", "Tijeras", "Pegamento", "Regla", "Colores", "Calculadora", "Compás", "Transportador", "Diccionario", "Tablet"]
+            }
+        };
+
+        // Variables del juego
+        let selectedGrade = 'kinder';
+        let currentDifficulty = difficultySettings[selectedGrade];
+        let gameTime = 0;
+        let timer;
+        let gameStarted = false;
+        let objectsFound = 0;
+        let score = 0;
+        let cameraActive = false;
+        let stream = null;
+
+        // Elementos DOM
+        const gradeScreen = document.getElementById('grade-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const difficultyInfo = document.getElementById('difficulty-info');
+        const gradeTitle = document.getElementById('grade-title');
+        const timerDisplay = document.getElementById('timer-display');
+        const timerElement = document.getElementById('timer');
+        const timeLeftElement = document.getElementById('time-left');
+        const objectListElement = document.getElementById('object-list');
+        const foundCountDisplay = document.getElementById('found-count');
+        const scoreDisplay = document.getElementById('score');
+        const startCameraBtn = document.getElementById('start-camera-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const startBtn = document.getElementById('start-btn');
+        const messageDiv = document.getElementById('message');
+        const winMessage = document.getElementById('win-message');
+        const finalScore = document.getElementById('final-score');
+        const finalTime = document.getElementById('final-time');
+        const cameraFeed = document.getElementById('camera-feed');
+        const cameraOverlay = document.getElementById('camera-overlay');
+        const progressBar = document.getElementById('progress');
+
+        // Iconos para los objetos
+        const objectIcons = {
+            "Lápiz": "fas fa-pencil-alt",
+            "Cuaderno": "fas fa-book",
+            "Borrador": "fas fa-eraser",
+            "Tijeras": "fas fa-cut",
+            "Pegamento": "fas fa-tint",
+            "Regla": "fas fa-ruler",
+            "Colores": "fas fa-palette",
+            "Calculadora": "fas fa-calculator",
+            "Compás": "fas fa-drafting-compass",
+            "Transportador": "fas fa-shapes",
+            "Diccionario": "fas fa-book-open",
+            "Tablet": "fas fa-tablet-alt"
+        };
+
+        // Inicializar el juego
+        function initGame() {
+            // Agregar event listeners a los botones de grado
+            const gradeButtons = document.querySelectorAll('.grade-btn');
+            gradeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    gradeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    selectedGrade = button.dataset.grade;
+                    currentDifficulty = difficultySettings[selectedGrade];
+                    updateDifficultyInfo();
+                });
+            });
+
+            // Botones de control
+            startBtn.addEventListener('click', startGame);
+            startCameraBtn.addEventListener('click', toggleCamera);
+            restartBtn.addEventListener('click', restartGame);
+            backToMenuBtn.addEventListener('click', showGradeScreen);
+
+            // Actualizar información de dificultad inicial
+            updateDifficultyInfo();
+        }
+
+        // Actualizar información de dificultad
+        function updateDifficultyInfo() {
+            const infoText = `Nivel: ${currentDifficulty.name} - ${currentDifficulty.objects} objetos, ${currentDifficulty.timeLimit} segundos`;
+            difficultyInfo.textContent = infoText;
+            gradeTitle.textContent = currentDifficulty.name;
+        }
+
+        // Comenzar el juego
+        function startGame() {
+            // Cambiar a pantalla de juego
+            gradeScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+
+            // Reiniciar variables del juego
+            gameTime = currentDifficulty.timeLimit;
+            objectsFound = 0;
+            score = 0;
+            gameStarted = true;
+
+            // Actualizar contadores
+            timerDisplay.textContent = gameTime;
+            timerElement.textContent = gameTime;
+            timeLeftElement.textContent = gameTime;
+            foundCountDisplay.textContent = objectsFound;
+            scoreDisplay.textContent = score;
+            progressBar.style.width = '100%';
+
+            // Crear lista de objetos
+            createObjectList();
+
+            // Iniciar temporizador
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+
+            // Ocultar mensaje de victoria
+            winMessage.style.display = 'none';
+
+            // Activar la cámara automáticamente
+            if (!cameraActive) {
+                toggleCamera();
+            }
+
+            showMessage('¡El juego ha comenzado! Encuentra los objetos y muéstralos frente a la cámara.', 'success');
+        }
+
+        // Crear lista de objetos
+        function createObjectList() {
+            objectListElement.innerHTML = '';
+
+            currentDifficulty.objectsList.forEach((object, index) => {
+                const objectItem = document.createElement('div');
+                objectItem.className = 'object-item';
+                objectItem.id = `object-${index}`;
+
+                const icon = document.createElement('i');
+                icon.className = objectIcons[object] || 'fas fa-question';
+                icon.classList.add('object-icon');
+
+                const text = document.createElement('span');
+                text.textContent = object;
+
+                objectItem.appendChild(icon);
+                objectItem.appendChild(text);
+                objectListElement.appendChild(objectItem);
+
+                // Marcar el primer objeto como actual
+                if (index === 0) {
+                    objectItem.classList.add('current');
+                }
+            });
+        }
+
+        // Actualizar temporizador
+        function updateTimer() {
+            if (!gameStarted) return;
+
+            gameTime--;
+            timerDisplay.textContent = gameTime;
+            timerElement.textContent = gameTime;
+            timeLeftElement.textContent = gameTime;
+
+            // Actualizar barra de progreso
+            const progressPercentage = (gameTime / currentDifficulty.timeLimit) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+
+            // Cambiar color cuando el tiempo sea crítico
+            if (gameTime <= 10) {
+                timerElement.style.color = '#F44336';
+                progressBar.style.background = 'linear-gradient(to right, #F44336, #FF9800)';
+            }
+
+            // Verificar si se acabó el tiempo
+            if (gameTime <= 0) {
+                endGame(false);
+            }
+        }
+
+        // Activar/desactivar cámara
+        function toggleCamera() {
+            if (cameraActive) {
+                // Desactivar cámara
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                cameraFeed.srcObject = null;
+                cameraOverlay.style.display = 'flex';
+                cameraActive = false;
+                startCameraBtn.innerHTML = '<i class="fas fa-camera"></i> Activar Cámara';
+                showMessage('Cámara desactivada', 'error');
+            } else {
+                // Activar cámara
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({
+                            video: true
+                        })
+                        .then(function(mediaStream) {
+                            stream = mediaStream;
+                            cameraFeed.srcObject = mediaStream;
+                            cameraOverlay.style.display = 'none';
+                            cameraActive = true;
+                            startCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Desactivar Cámara';
+                            showMessage('Cámara activada. ¡Muestra los objetos frente a la cámara!', 'success');
+
+                            // Simular reconocimiento de objetos (en un caso real, aquí iría la lógica de IA)
+                            simulateObjectRecognition();
+                        })
+                        .catch(function(error) {
+                            console.error("Error al acceder a la cámara: ", error);
+                            showMessage('Error al acceder a la cámara. Asegúrate de permitir el acceso.', 'error');
+                        });
+                } else {
+                    showMessage('Tu navegador no soporta el acceso a la cámara.', 'error');
+                }
+            }
+        }
+
+        // Simular reconocimiento de objetos (en un caso real, esto sería con IA/ML)
+        function simulateObjectRecognition() {
+            if (!gameStarted || !cameraActive) return;
+
+            // Simular detección aleatoria de objetos cada 3 segundos
+            setInterval(() => {
+                if (!gameStarted || objectsFound >= currentDifficulty.objectsList.length) return;
+
+                // En una implementación real, aquí se analizaría el video para detectar objetos
+                // Por ahora, simulamos una detección aleatoria
+                if (Math.random() > 0.7) { // 30% de probabilidad de detección
+                    const currentObjectIndex = objectsFound;
+                    const currentObject = currentDifficulty.objectsList[currentObjectIndex];
+
+                    // Marcar objeto como encontrado
+                    markObjectFound(currentObjectIndex);
+                }
+            }, 3000);
+        }
+
+        // Marcar objeto como encontrado
+        function markObjectFound(objectIndex) {
+            const objectElement = document.getElementById(`object-${objectIndex}`);
+            objectElement.classList.remove('current');
+            objectElement.classList.add('found');
+
+            objectsFound++;
+            foundCountDisplay.textContent = objectsFound;
+
+            // Calcular puntos basados en el tiempo restante
+            const pointsEarned = Math.floor(gameTime * 10 / currentDifficulty.timeLimit);
+            score += pointsEarned;
+            scoreDisplay.textContent = score;
+
+            // Resaltar el siguiente objeto
+            if (objectIndex < currentDifficulty.objectsList.length - 1) {
+                const nextObjectElement = document.getElementById(`object-${objectIndex + 1}`);
+                nextObjectElement.classList.add('current');
+            }
+
+            showMessage(`¡Encontraste ${currentDifficulty.objectsList[objectIndex]}! +${pointsEarned} puntos`, 'success');
+
+            // Verificar si se encontraron todos los objetos
+            if (objectsFound >= currentDifficulty.objectsList.length) {
+                endGame(true);
+            }
+        }
+
+        // Finalizar el juego
+        function endGame(isWin) {
+            gameStarted = false;
+            clearInterval(timer);
+
+            if (isWin) {
+                finalScore.textContent = score;
+                finalTime.textContent = gameTime;
+                winMessage.style.display = 'block';
+                showMessage('¡Felicidades! Has encontrado todos los objetos.', 'success');
+            } else {
+                showMessage('¡Se acabó el tiempo! Inténtalo de nuevo.', 'error');
+            }
+        }
+
+        // Reiniciar juego
+        function restartGame() {
+            // Detener temporizador
+            clearInterval(timer);
+            gameStarted = false;
+
+            // Reiniciar juego
+            startGame();
+        }
+
+        // Mostrar pantalla de selección de grado
+        function showGradeScreen() {
+            clearInterval(timer);
+            gameScreen.classList.remove('active');
+            gradeScreen.classList.add('active');
+
+            // Desactivar cámara si está activa
+            if (cameraActive) {
+                toggleCamera();
+            }
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+
+            // Ocultar mensaje después de 3 segundos
+            setTimeout(function() {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Iniciar el juego cuando se carga la página
+        window.onload = initGame;
+    </script>
+</body>
+
+</html>

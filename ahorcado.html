@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorcado - Juego de Palabras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .hangman-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .hangman-drawing {
+            width: 200px;
+            height: 250px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .hangman-part {
+            position: absolute;
+            background-color: #333;
+            display: none;
+        }
+        
+        .gallows {
+            position: absolute;
+            background-color: #8B4513;
+        }
+        
+        .gallows-base {
+            width: 150px;
+            height: 10px;
+            bottom: 0;
+            left: 25px;
+        }
+        
+        .gallows-pole {
+            width: 10px;
+            height: 200px;
+            bottom: 0;
+            left: 25px;
+        }
+        
+        .gallows-top {
+            width: 100px;
+            height: 10px;
+            top: 0;
+            left: 35px;
+        }
+        
+        .gallows-rope {
+            width: 5px;
+            height: 30px;
+            background-color: #8B4513;
+            top: 10px;
+            left: 85px;
+            position: absolute;
+        }
+        
+        .head {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            top: 40px;
+            left: 75px;
+        }
+        
+        .body {
+            width: 10px;
+            height: 70px;
+            top: 80px;
+            left: 85px;
+        }
+        
+        .left-arm {
+            width: 40px;
+            height: 10px;
+            top: 100px;
+            left: 45px;
+            transform: rotate(30deg);
+        }
+        
+        .right-arm {
+            width: 40px;
+            height: 10px;
+            top: 100px;
+            left: 85px;
+            transform: rotate(-30deg);
+        }
+        
+        .left-leg {
+            width: 40px;
+            height: 10px;
+            top: 150px;
+            left: 45px;
+            transform: rotate(30deg);
+        }
+        
+        .right-leg {
+            width: 40px;
+            height: 10px;
+            top: 150px;
+            left: 85px;
+            transform: rotate(-30deg);
+        }
+        
+        .word-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .letter {
+            width: 40px;
+            height: 40px;
+            border-bottom: 3px solid #7b68ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #5a4fcf;
+        }
+        
+        .letter-space {
+            width: 20px;
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .key {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .key:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        .key:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .key.used {
+            background: linear-gradient(to right, #888, #aaa);
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .difficulty {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .difficulty-selector {
+            display: inline-flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #7b68ee;
+            color: white;
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .completion-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .completion-message p {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .key {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            .letter {
+                width: 30px;
+                height: 30px;
+                font-size: 20px;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+            .hangman-drawing {
+                width: 150px;
+                height: 200px;
+            }
+            .head {
+                width: 30px;
+                height: 30px;
+                top: 40px;
+                left: 60px;
+            }
+            .body {
+                top: 70px;
+                left: 67px;
+            }
+            .left-arm,
+            .right-arm,
+            .left-leg,
+            .right-leg {
+                width: 30px;
+            }
+            .left-arm {
+                top: 85px;
+                left: 37px;
+            }
+            .right-arm {
+                top: 85px;
+                left: 67px;
+            }
+            .left-leg {
+                top: 125px;
+                left: 37px;
+            }
+            .right-leg {
+                top: 125px;
+                left: 67px;
+            }
+            .gallows-rope {
+                left: 67px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .key {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .letter {
+                width: 25px;
+                height: 25px;
+                font-size: 18px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        .hint-section {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .hint-btn {
+            background: linear-gradient(to right, #ffa726, #ff9800);
+            min-width: 120px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .category {
+            text-align: center;
+            margin: 10px 0;
+            font-style: italic;
+            color: #7b68ee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Juego del Ahorcado</h1>
+            <h2>Instrucciones</h2>
+            <h3>Adivina la palabra secreta antes de que se complete el dibujo del ahorcado</h3>
+        </header>
+
+        <div class="instructions">
+            <p>Selecciona una letra del teclado para adivinar la palabra. Cada error dibuja una parte del ahorcado. Tienes 6 intentos.</p>
+            <div class="difficulty">
+                <span>Dificultad:</span>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Medio</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="hangman-container">
+                <div class="hangman-drawing">
+                    <!-- Horca -->
+                    <div class="gallows gallows-base"></div>
+                    <div class="gallows gallows-pole"></div>
+                    <div class="gallows gallows-top"></div>
+                    <div class="gallows-rope"></div>
+
+                    <!-- Partes del ahorcado -->
+                    <div class="hangman-part head"></div>
+                    <div class="hangman-part body"></div>
+                    <div class="hangman-part left-arm"></div>
+                    <div class="hangman-part right-arm"></div>
+                    <div class="hangman-part left-leg"></div>
+                    <div class="hangman-part right-leg"></div>
+                </div>
+
+                <div class="category" id="category">Categoría: Animales</div>
+
+                <div class="word-display" id="wordDisplay">
+                    <!-- Las letras de la palabra se insertarán aquí dinámicamente -->
+                </div>
+
+                <div class="hint-section">
+                    <button class="hint-btn" id="hintBtn">Pista</button>
+                    <span id="hintText" style="display: none; margin-left: 10px;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="keyboard" id="keyboard">
+            <!-- El teclado se generará aquí dinámicamente -->
+        </div>
+
+        <div class="controls">
+            <button id="newGame">Nuevo Juego</button>
+            <button id="solveWord">Resolver Palabra</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="completionMessage" class="completion-message">
+            <h3 id="resultTitle">¡Felicidades!</h3>
+            <p id="resultMessage">Has adivinado la palabra correctamente.</p>
+            <button id="playAgain">Jugar Otra Vez</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="remainingAttempts">6</div>
+                <div>Intentos Restantes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="gamesWon">0</div>
+                <div>Partidas Ganadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="gamesPlayed">0</div>
+                <div>Partidas Jugadas</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración del juego
+            let currentDifficulty = 'easy';
+            let currentWord = '';
+            let guessedLetters = [];
+            let wrongAttempts = 0;
+            let maxAttempts = 6;
+            let gamesWon = 0;
+            let gamesPlayed = 0;
+            let currentCategory = '';
+            let hintUsed = false;
+
+            // Palabras por categoría y dificultad
+            const wordCategories = {
+                easy: {
+                    'Animales': ['GATO', 'PERRO', 'RATON', 'OSO', 'PEZ', 'LOBO', 'CABRA', 'OVEJA', 'CISNE', 'PATOS'],
+                    'Frutas': ['MANZANA', 'PERA', 'UVA', 'KIWI', 'MANGO', 'CEREZA', 'MELON', 'SANDIA', 'PLATANO', 'NARANJA'],
+                    'Colores': ['ROJO', 'AZUL', 'VERDE', 'AMARILLO', 'NEGRO', 'BLANCO', 'ROSA', 'MORADO', 'NARANJA', 'GRIS']
+                },
+                medium: {
+                    'Países': ['ESPAÑA', 'FRANCIA', 'ITALIA', 'ALEMANIA', 'CANADA', 'BRASIL', 'CHILE', 'MEXICO', 'JAPON', 'CHINA'],
+                    'Profesiones': ['MEDICO', 'MAESTRO', 'INGENIERO', 'PROGRAMADOR', 'ARQUITECTO', 'ABOGADO', 'POLICIA', 'BOMBERO', 'CIENTIFICO', 'ARTISTA'],
+                    'Deportes': ['FUTBOL', 'BALONCESTO', 'TENIS', 'NATACION', 'CICLISMO', 'ATLETISMO', 'VOLEIBOL', 'GOLF', 'BOXEO', 'JUDO']
+                },
+                hard: {
+                    'Ciencias': ['QUIMICA', 'FISICA', 'BIOLOGIA', 'GEOLOGIA', 'ASTRONOMIA', 'MATEMATICAS', 'ECOLOGIA', 'GENETICA', 'NEUROLOGIA', 'BOTANICA'],
+                    'Tecnología': ['COMPUTADORA', 'ALGORITMO', 'PROGRAMACION', 'INTELIGENCIA', 'ROBOTICA', 'INTERNET', 'SISTEMA', 'APLICACION', 'DISPOSITIVO', 'PLATAFORMA'],
+                    'Literatura': ['NOVELA', 'POESIA', 'DRAMA', 'ENSAYO', 'BIOGRAFIA', 'FICCION', 'MITOLOGIA', 'CLASICO', 'CONTEMPORANEO', 'ROMANTICISMO']
+                }
+            };
+
+            // Elementos del DOM
+            const wordDisplay = document.getElementById('wordDisplay');
+            const keyboard = document.getElementById('keyboard');
+            const newGameBtn = document.getElementById('newGame');
+            const solveWordBtn = document.getElementById('solveWord');
+            const playAgainBtn = document.getElementById('playAgain');
+            const messageDiv = document.getElementById('message');
+            const completionMessage = document.getElementById('completionMessage');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const remainingAttemptsElem = document.getElementById('remainingAttempts');
+            const gamesWonElem = document.getElementById('gamesWon');
+            const gamesPlayedElem = document.getElementById('gamesPlayed');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+            const hintBtn = document.getElementById('hintBtn');
+            const hintText = document.getElementById('hintText');
+            const categoryElem = document.getElementById('category');
+            const hangmanParts = document.querySelectorAll('.hangman-part');
+
+            // Inicializar el juego
+            initGame();
+
+            // Función para inicializar el juego
+            function initGame() {
+                // Reiniciar estado del juego
+                guessedLetters = [];
+                wrongAttempts = 0;
+                hintUsed = false;
+                hintText.style.display = 'none';
+
+                // Seleccionar una palabra aleatoria según la dificultad
+                selectRandomWord();
+
+                // Actualizar la visualización de la palabra
+                updateWordDisplay();
+
+                // Actualizar el teclado
+                initKeyboard();
+
+                // Actualizar el dibujo del ahorcado
+                updateHangmanDrawing();
+
+                // Actualizar estadísticas
+                remainingAttemptsElem.textContent = maxAttempts - wrongAttempts;
+
+                // Ocultar mensaje de finalización
+                completionMessage.style.display = 'none';
+
+                // Habilitar botones
+                newGameBtn.disabled = false;
+                solveWordBtn.disabled = false;
+                hintBtn.disabled = false;
+            }
+
+            // Función para seleccionar una palabra aleatoria
+            function selectRandomWord() {
+                // Obtener categorías para la dificultad actual
+                const categories = wordCategories[currentDifficulty];
+
+                // Seleccionar una categoría aleatoria
+                const categoryNames = Object.keys(categories);
+                const randomCategory = categoryNames[Math.floor(Math.random() * categoryNames.length)];
+                currentCategory = randomCategory;
+
+                // Seleccionar una palabra aleatoria de la categoría
+                const words = categories[randomCategory];
+                currentWord = words[Math.floor(Math.random() * words.length)];
+
+                // Actualizar la categoría en la interfaz
+                categoryElem.textContent = `Categoría: ${randomCategory}`;
+            }
+
+            // Función para actualizar la visualización de la palabra
+            function updateWordDisplay() {
+                wordDisplay.innerHTML = '';
+
+                for (let i = 0; i < currentWord.length; i++) {
+                    const letter = currentWord[i];
+                    const letterElem = document.createElement('div');
+
+                    if (letter === ' ') {
+                        letterElem.classList.add('letter-space');
+                    } else {
+                        letterElem.classList.add('letter');
+                        if (guessedLetters.includes(letter)) {
+                            letterElem.textContent = letter;
+                        }
+                    }
+
+                    wordDisplay.appendChild(letterElem);
+                }
+            }
+
+            // Función para inicializar el teclado
+            function initKeyboard() {
+                keyboard.innerHTML = '';
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+                for (let i = 0; i < letters.length; i++) {
+                    const letter = letters[i];
+                    const key = document.createElement('button');
+                    key.classList.add('key');
+                    key.textContent = letter;
+                    key.dataset.letter = letter;
+
+                    if (guessedLetters.includes(letter)) {
+                        key.disabled = true;
+                        key.classList.add('used');
+                    }
+
+                    key.addEventListener('click', function() {
+                        guessLetter(letter);
+                    });
+
+                    keyboard.appendChild(key);
+                }
+            }
+
+            // Función para adivinar una letra
+            function guessLetter(letter) {
+                if (guessedLetters.includes(letter)) {
+                    showMessage('Ya has intentado con esta letra.', 'error');
+                    return;
+                }
+
+                guessedLetters.push(letter);
+
+                // Actualizar el teclado
+                const key = document.querySelector(`.key[data-letter="${letter}"]`);
+                key.disabled = true;
+                key.classList.add('used');
+
+                // Verificar si la letra está en la palabra
+                if (currentWord.includes(letter)) {
+                    showMessage(`¡Correcto! La letra "${letter}" está en la palabra.`, 'success');
+                } else {
+                    wrongAttempts++;
+                    showMessage(`La letra "${letter}" no está en la palabra.`, 'error');
+                    updateHangmanDrawing();
+                }
+
+                // Actualizar la visualización de la palabra
+                updateWordDisplay();
+
+                // Actualizar estadísticas
+                remainingAttemptsElem.textContent = maxAttempts - wrongAttempts;
+
+                // Verificar si el juego ha terminado
+                checkGameStatus();
+            }
+
+            // Función para actualizar el dibujo del ahorcado
+            function updateHangmanDrawing() {
+                // Mostrar las partes del ahorcado según los errores
+                for (let i = 0; i < hangmanParts.length; i++) {
+                    if (i < wrongAttempts) {
+                        hangmanParts[i].style.display = 'block';
+                    } else {
+                        hangmanParts[i].style.display = 'none';
+                    }
+                }
+            }
+
+            // Función para verificar el estado del juego
+            function checkGameStatus() {
+                // Verificar si el jugador ganó
+                let hasWon = true;
+                for (let i = 0; i < currentWord.length; i++) {
+                    const letter = currentWord[i];
+                    if (letter !== ' ' && !guessedLetters.includes(letter)) {
+                        hasWon = false;
+                        break;
+                    }
+                }
+
+                if (hasWon) {
+                    endGame(true);
+                    return;
+                }
+
+                // Verificar si el jugador perdió
+                if (wrongAttempts >= maxAttempts) {
+                    endGame(false);
+                }
+            }
+
+            // Función para finalizar el juego
+            function endGame(isWin) {
+                gamesPlayed++;
+                gamesPlayedElem.textContent = gamesPlayed;
+
+                if (isWin) {
+                    gamesWon++;
+                    gamesWonElem.textContent = gamesWon;
+                    resultTitle.textContent = '¡Felicidades!';
+                    resultMessage.textContent = `Has adivinado la palabra "${currentWord}" correctamente.`;
+                } else {
+                    resultTitle.textContent = '¡Game Over!';
+                    resultMessage.textContent = `La palabra era "${currentWord}". Mejor suerte la próxima vez.`;
+                }
+
+                // Deshabilitar todas las teclas
+                const keys = document.querySelectorAll('.key');
+                keys.forEach(key => {
+                    key.disabled = true;
+                });
+
+                // Deshabilitar botones
+                newGameBtn.disabled = true;
+                solveWordBtn.disabled = true;
+                hintBtn.disabled = true;
+
+                // Mostrar mensaje de finalización
+                completionMessage.style.display = 'block';
+            }
+
+            // Función para mostrar mensajes
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // Evento para el botón de nuevo juego
+            newGameBtn.addEventListener('click', function() {
+                initGame();
+                showMessage('Nuevo juego iniciado.', 'success');
+            });
+
+            // Evento para el botón de resolver palabra
+            solveWordBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que quieres revelar la palabra?')) {
+                    // Revelar todas las letras
+                    for (let i = 0; i < currentWord.length; i++) {
+                        const letter = currentWord[i];
+                        if (!guessedLetters.includes(letter) && letter !== ' ') {
+                            guessedLetters.push(letter);
+                        }
+                    }
+
+                    // Actualizar la visualización
+                    updateWordDisplay();
+                    initKeyboard();
+
+                    // Finalizar el juego (como pérdida)
+                    endGame(false);
+                }
+            });
+
+            // Evento para el botón de jugar otra vez
+            playAgainBtn.addEventListener('click', function() {
+                initGame();
+                showMessage('Nuevo juego iniciado.', 'success');
+            });
+
+            // Eventos para los botones de dificultad
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Actualizar botones activos
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Cambiar dificultad
+                    currentDifficulty = this.dataset.difficulty;
+
+                    // Reiniciar juego con nueva dificultad
+                    initGame();
+                    showMessage(`Dificultad cambiada a ${this.textContent}.`, 'success');
+                });
+            });
+
+            // Evento para el botón de pista
+            hintBtn.addEventListener('click', function() {
+                if (hintUsed) {
+                    showMessage('Ya has usado tu pista en este juego.', 'error');
+                    return;
+                }
+
+                // Encontrar una letra no adivinada
+                let availableLetters = [];
+                for (let i = 0; i < currentWord.length; i++) {
+                    const letter = currentWord[i];
+                    if (!guessedLetters.includes(letter) && letter !== ' ') {
+                        availableLetters.push(letter);
+                    }
+                }
+
+                if (availableLetters.length > 0) {
+                    // Seleccionar una letra aleatoria para la pista
+                    const randomLetter = availableLetters[Math.floor(Math.random() * availableLetters.length)];
+                    hintText.textContent = `La palabra contiene la letra "${randomLetter}"`;
+                    hintText.style.display = 'inline';
+                    hintUsed = true;
+                    hintBtn.disabled = true;
+                } else {
+                    showMessage('Ya has adivinado todas las letras.', 'success');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

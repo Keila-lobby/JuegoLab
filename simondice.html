@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simón Dice - Juego de Instrucciones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .simon-display {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7b68ee, #98fb98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .simon-face {
+            width: 150px;
+            height: 150px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .simon-eyes {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .simon-eye {
+            width: 30px;
+            height: 30px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .simon-mouth {
+            width: 60px;
+            height: 20px;
+            background-color: #7b68ee;
+            border-radius: 10px;
+        }
+        
+        .command-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #5a4fcf;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f5ff;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .action-btn {
+            width: 120px;
+            height: 120px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .action-btn.levantar {
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+        }
+        
+        .action-btn.sentar {
+            background: linear-gradient(to right, #4ecdc4, #88d8d0);
+        }
+        
+        .action-btn.saltar {
+            background: linear-gradient(to right, #45b7d1, #7acde3);
+        }
+        
+        .action-btn.girar {
+            background: linear-gradient(to right, #96ceb4, #b8e0c9);
+        }
+        
+        .action-btn.bailar {
+            background: linear-gradient(to right, #feca57, #ffda8f);
+        }
+        
+        .action-btn.aplaudir {
+            background: linear-gradient(to right, #ff9ff3, #ffb9f5);
+        }
+        
+        .action-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .difficulty {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .difficulty-selector {
+            display: inline-flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #7b68ee;
+            color: white;
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .completion-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .completion-message p {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .simon-display {
+                width: 250px;
+                height: 250px;
+            }
+            .simon-face {
+                width: 120px;
+                height: 120px;
+            }
+            .action-btn {
+                width: 100px;
+                height: 100px;
+                font-size: 16px;
+            }
+            .action-icon {
+                font-size: 30px;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .simon-display {
+                width: 200px;
+                height: 200px;
+            }
+            .simon-face {
+                width: 100px;
+                height: 100px;
+            }
+            .simon-eye {
+                width: 20px;
+                height: 20px;
+            }
+            .simon-mouth {
+                width: 40px;
+                height: 15px;
+            }
+            .action-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 14px;
+            }
+            .action-icon {
+                font-size: 24px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            .command-display {
+                font-size: 22px;
+                min-height: 60px;
+            }
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 20px;
+            margin: 10px 0;
+            color: #5a4fcf;
+        }
+        
+        .highlight {
+            animation: highlight 0.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Simón Dice</h1>
+            <h2>Juego de Instrucciones</h2>
+            <h3>Solo obedece las órdenes que empiecen con "Simón dice..."</h3>
+        </header>
+
+        <div class="instructions">
+            <p>Simón te dará instrucciones. Solo debes obedecer si la orden comienza con "Simón dice...". Si te equivocas, perderás puntos. ¡Presta mucha atención!</p>
+            <div class="difficulty">
+                <span>Dificultad:</span>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Medio</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="simon-display pulse">
+                <div class="simon-face">
+                    <div class="simon-eyes">
+                        <div class="simon-eye"></div>
+                        <div class="simon-eye"></div>
+                    </div>
+                    <div class="simon-mouth"></div>
+                </div>
+            </div>
+
+            <div class="command-display" id="commandDisplay">
+                ¡Presiona "Comenzar" para iniciar!
+            </div>
+
+            <div class="score-display">
+                Puntuación: <span id="scoreValue">0</span> | Racha: <span id="streakValue">0</span>
+            </div>
+
+            <div class="timer" id="timer">
+                Tiempo: 0s
+            </div>
+
+            <div class="actions">
+                <button class="action-btn levantar" id="actionLevantar">
+                    <div class="action-icon">👆</div>
+                    Levantar
+                </button>
+                <button class="action-btn sentar" id="actionSentar">
+                    <div class="action-icon">👇</div>
+                    Sentar
+                </button>
+                <button class="action-btn saltar" id="actionSaltar">
+                    <div class="action-icon">🦘</div>
+                    Saltar
+                </button>
+                <button class="action-btn girar" id="actionGirar">
+                    <div class="action-icon">🌀</div>
+                    Girar
+                </button>
+                <button class="action-btn bailar" id="actionBailar">
+                    <div class="action-icon">💃</div>
+                    Bailar
+                </button>
+                <button class="action-btn aplaudir" id="actionAplaudir">
+                    <div class="action-icon">👏</div>
+                    Aplaudir
+                </button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startGame">Comenzar Juego</button>
+            <button id="pauseGame" disabled>Pausar</button>
+            <button id="resetGame">Reiniciar</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="completionMessage" class="completion-message">
+            <h3 id="resultTitle">¡Juego Terminado!</h3>
+            <p id="resultMessage">Tu puntuación final es: <span id="finalScore">0</span></p>
+            <button id="playAgain">Jugar Otra Vez</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="gamesWon">0</div>
+                <div>Partidas Ganadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="gamesPlayed">0</div>
+                <div>Partidas Jugadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="bestScore">0</div>
+                <div>Mejor Puntuación</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración del juego
+            let currentDifficulty = 'easy';
+            let gameActive = false;
+            let score = 0;
+            let streak = 0;
+            let bestScore = 0;
+            let gamesWon = 0;
+            let gamesPlayed = 0;
+            let timer = 0;
+            let timerInterval;
+            let currentCommand = '';
+            let simonSays = false;
+            let commandTimeout;
+
+            // Comandos disponibles
+            const commands = [
+                'levantar la mano',
+                'sentarse',
+                'saltar',
+                'girar',
+                'bailar',
+                'aplaudir',
+                'tocar la nariz',
+                'agacharse',
+                'mover la cabeza',
+                'cerrar los ojos'
+            ];
+
+            // Elementos del DOM
+            const commandDisplay = document.getElementById('commandDisplay');
+            const scoreValue = document.getElementById('scoreValue');
+            const streakValue = document.getElementById('streakValue');
+            const timerElem = document.getElementById('timer');
+            const startGameBtn = document.getElementById('startGame');
+            const pauseGameBtn = document.getElementById('pauseGame');
+            const resetGameBtn = document.getElementById('resetGame');
+            const playAgainBtn = document.getElementById('playAgain');
+            const messageDiv = document.getElementById('message');
+            const completionMessage = document.getElementById('completionMessage');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const finalScore = document.getElementById('finalScore');
+            const gamesWonElem = document.getElementById('gamesWon');
+            const gamesPlayedElem = document.getElementById('gamesPlayed');
+            const bestScoreElem = document.getElementById('bestScore');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+            const actionButtons = document.querySelectorAll('.action-btn');
+            const simonDisplay = document.querySelector('.simon-display');
+
+            // Inicializar el juego
+            initGame();
+
+            // Función para inicializar el juego
+            function initGame() {
+                // Reiniciar estado del juego
+                score = 0;
+                streak = 0;
+                timer = 0;
+                gameActive = false;
+
+                // Actualizar la interfaz
+                updateScore();
+                timerElem.textContent = 'Tiempo: 0s';
+                commandDisplay.textContent = '¡Presiona "Comenzar" para iniciar!';
+
+                // Deshabilitar botones de acción
+                actionButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                // Habilitar botones de control
+                startGameBtn.disabled = false;
+                pauseGameBtn.disabled = true;
+                resetGameBtn.disabled = false;
+
+                // Ocultar mensaje de finalización
+                completionMessage.style.display = 'none';
+
+                // Detener temporizador si está activo
+                clearInterval(timerInterval);
+                clearTimeout(commandTimeout);
+            }
+
+            // Función para comenzar el juego
+            function startGame() {
+                if (gameActive) return;
+
+                gameActive = true;
+                startGameBtn.disabled = true;
+                pauseGameBtn.disabled = false;
+
+                // Habilitar botones de acción
+                actionButtons.forEach(btn => {
+                    btn.disabled = false;
+                });
+
+                // Iniciar temporizador
+                timerInterval = setInterval(function() {
+                    timer++;
+                    timerElem.textContent = `Tiempo: ${timer}s`;
+                }, 1000);
+
+                // Generar primer comando
+                generateCommand();
+
+                showMessage('¡El juego ha comenzado! Presta atención a Simón.', 'success');
+            }
+
+            // Función para pausar el juego
+            function pauseGame() {
+                if (!gameActive) return;
+
+                gameActive = false;
+                startGameBtn.disabled = false;
+                pauseGameBtn.disabled = true;
+
+                // Deshabilitar botones de acción
+                actionButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                // Pausar temporizador
+                clearInterval(timerInterval);
+                clearTimeout(commandTimeout);
+
+                showMessage('Juego en pausa. Presiona "Comenzar" para continuar.', 'success');
+            }
+
+            // Función para generar un comando aleatorio
+            function generateCommand() {
+                if (!gameActive) return;
+
+                // Decidir si Simón dice o no
+                simonSays = Math.random() > 0.3; // 70% de probabilidad de que Simón diga
+
+                // Seleccionar un comando aleatorio
+                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+                currentCommand = randomCommand;
+
+                // Mostrar el comando
+                if (simonSays) {
+                    commandDisplay.textContent = `Simón dice: ${randomCommand}`;
+                    commandDisplay.style.color = '#5a4fcf';
+                } else {
+                    commandDisplay.textContent = randomCommand;
+                    commandDisplay.style.color = '#c62828';
+                }
+
+                // Añadir efecto de resaltado
+                commandDisplay.classList.add('highlight');
+                setTimeout(() => {
+                    commandDisplay.classList.remove('highlight');
+                }, 500);
+
+                // Configurar tiempo para responder según la dificultad
+                let timeToRespond;
+                switch (currentDifficulty) {
+                    case 'easy':
+                        timeToRespond = 5000;
+                        break;
+                    case 'medium':
+                        timeToRespond = 3500;
+                        break;
+                    case 'hard':
+                        timeToRespond = 2000;
+                        break;
+                    default:
+                        timeToRespond = 5000;
+                }
+
+                // Configurar timeout para el siguiente comando
+                commandTimeout = setTimeout(function() {
+                    if (gameActive) {
+                        // Si no se ha respondido, cuenta como error
+                        if (simonSays) {
+                            // Simón dijo pero no respondiste - error
+                            handleIncorrectAction();
+                        } else {
+                            // Simón no dijo y no respondiste - correcto
+                            handleCorrectNonAction();
+                        }
+                    }
+                }, timeToRespond);
+            }
+
+            // Función para manejar una acción correcta
+            function handleCorrectAction() {
+                score += 10;
+                streak++;
+                updateScore();
+                showMessage('¡Correcto! +10 puntos', 'success');
+                generateCommand();
+            }
+
+            // Función para manejar cuando no se actúa correctamente (cuando Simón no dijo)
+            function handleCorrectNonAction() {
+                score += 5;
+                streak++;
+                updateScore();
+                showMessage('¡Bien! No te dejaste engañar. +5 puntos', 'success');
+                generateCommand();
+            }
+
+            // Función para manejar una acción incorrecta
+            function handleIncorrectAction() {
+                streak = 0;
+                updateScore();
+                showMessage('¡Error! Esa orden no era de Simón. Racha reiniciada.', 'error');
+
+                // Efecto visual de error
+                simonDisplay.style.animation = 'none';
+                setTimeout(() => {
+                    simonDisplay.style.animation = 'pulse 1s infinite';
+                }, 10);
+
+                generateCommand();
+            }
+
+            // Función para actualizar la puntuación
+            function updateScore() {
+                scoreValue.textContent = score;
+                streakValue.textContent = streak;
+
+                // Actualizar mejor puntuación si es necesario
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestScoreElem.textContent = bestScore;
+                }
+            }
+
+            // Función para finalizar el juego
+            function endGame() {
+                gameActive = false;
+                gamesPlayed++;
+                gamesPlayedElem.textContent = gamesPlayed;
+
+                if (score >= 100) {
+                    gamesWon++;
+                    gamesWonElem.textContent = gamesWon;
+                    resultTitle.textContent = '¡Felicidades!';
+                    resultMessage.textContent = `Has ganado con una puntuación de ${score} puntos.`;
+                } else {
+                    resultTitle.textContent = '¡Juego Terminado!';
+                    resultMessage.textContent = `Tu puntuación final es: ${score} puntos.`;
+                }
+
+                finalScore.textContent = score;
+
+                // Deshabilitar botones de acción
+                actionButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                // Deshabilitar botones de control
+                startGameBtn.disabled = true;
+                pauseGameBtn.disabled = true;
+
+                // Detener temporizadores
+                clearInterval(timerInterval);
+                clearTimeout(commandTimeout);
+
+                // Mostrar mensaje de finalización
+                completionMessage.style.display = 'block';
+            }
+
+            // Función para mostrar mensajes
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // Eventos para los botones de acción
+            document.getElementById('actionLevantar').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('levantar')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('levantar')) {
+                    handleIncorrectAction();
+                } else {
+                    // Acción incorrecta (botón incorrecto)
+                    handleIncorrectAction();
+                }
+            });
+
+            document.getElementById('actionSentar').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('sentar')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('sentar')) {
+                    handleIncorrectAction();
+                } else {
+                    handleIncorrectAction();
+                }
+            });
+
+            document.getElementById('actionSaltar').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('saltar')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('saltar')) {
+                    handleIncorrectAction();
+                } else {
+                    handleIncorrectAction();
+                }
+            });
+
+            document.getElementById('actionGirar').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('girar')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('girar')) {
+                    handleIncorrectAction();
+                } else {
+                    handleIncorrectAction();
+                }
+            });
+
+            document.getElementById('actionBailar').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('bailar')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('bailar')) {
+                    handleIncorrectAction();
+                } else {
+                    handleIncorrectAction();
+                }
+            });
+
+            document.getElementById('actionAplaudir').addEventListener('click', function() {
+                if (!gameActive) return;
+
+                if (simonSays && currentCommand.includes('aplaudir')) {
+                    handleCorrectAction();
+                } else if (!simonSays && currentCommand.includes('aplaudir')) {
+                    handleIncorrectAction();
+                } else {
+                    handleIncorrectAction();
+                }
+            });
+
+            // Evento para el botón de comenzar juego
+            startGameBtn.addEventListener('click', function() {
+                startGame();
+            });
+
+            // Evento para el botón de pausar juego
+            pauseGameBtn.addEventListener('click', function() {
+                pauseGame();
+            });
+
+            // Evento para el botón de reiniciar juego
+            resetGameBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que quieres reiniciar el juego?')) {
+                    initGame();
+                    showMessage('Juego reiniciado.', 'success');
+                }
+            });
+
+            // Evento para el botón de jugar otra vez
+            playAgainBtn.addEventListener('click', function() {
+                initGame();
+                showMessage('¡Nuevo juego!', 'success');
+            });
+
+            // Eventos para los botones de dificultad
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Actualizar botones activos
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Cambiar dificultad
+                    currentDifficulty = this.dataset.difficulty;
+
+                    showMessage(`Dificultad cambiada a ${this.textContent}.`, 'success');
+                });
+            });
+
+            // Finalizar el juego después de 2 minutos (120 segundos)
+            setTimeout(() => {
+                if (gameActive) {
+                    endGame();
+                }
+            }, 120000);
+        });
+    </script>
+</body>
+
+</html>

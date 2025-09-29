@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sopa de Letras Mejorada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .word-item {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .word-item.found {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .word-item.found::after {
+            content: "✓";
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .word-search {
+            margin-bottom: 20px;
+            overflow: auto;
+            max-width: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        td {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+        }
+        
+        td.selected {
+            background-color: #7b68ee;
+            color: white;
+        }
+        
+        td.found {
+            background-color: #98fb98;
+            color: #2e7d32;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .difficulty {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .difficulty-selector {
+            display: inline-flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #7b68ee;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            td {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            .word-list {
+                justify-content: center;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            td {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .completion-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .completion-message p {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-animation {
+            animation: highlight 1.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% {
+                background-color: #98fb98;
+            }
+            50% {
+                background-color: #7b68ee;
+            }
+            100% {
+                background-color: #98fb98;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Sopa de Letras Mejorada</h1>
+            <h2>Instrucciones</h2>
+            <h3>Encuentra las siguientes palabras esparcidas en el cuadro...</h3>
+        </header>
+
+        <div class="instructions">
+            <p>Para jugar, haz clic y arrastra sobre las letras para seleccionar una palabra. Las palabras pueden estar en horizontal, vertical o diagonal (en cualquier dirección).</p>
+            <div class="difficulty">
+                <span>Dificultad:</span>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Medio</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="word-list" id="wordList">
+            <!-- Las palabras se insertarán aquí dinámicamente -->
+        </div>
+
+        <div class="game-area">
+            <div class="word-search">
+                <table id="wordSearch">
+                    <!-- La sopa de letras se generará aquí dinámicamente -->
+                </table>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="checkWord">Verificar Palabra</button>
+            <button id="resetSelection">Reiniciar Selección</button>
+            <button id="solvePuzzle">Resolver Sopa</button>
+            <button id="newGame">Nuevo Juego</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="completionMessage" class="completion-message">
+            <h3>¡Felicidades!</h3>
+            <p>Has completado la sopa de letras en <span id="completionTime">00:00</span></p>
+            <button id="playAgain">Jugar Otra Vez</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="foundWords">0</div>
+                <div>Palabras Encontradas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalWords">10</div>
+                <div>Total de Palabras</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="timeSpent">00:00</div>
+                <div>Tiempo</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración del juego
+            let words = [];
+            let wordPositions = {};
+            let currentDifficulty = 'easy';
+
+            // Configuración de la sopa de letras
+            const rows = 12;
+            const cols = 12;
+
+            // Estado del juego
+            let selectedCells = [];
+            let foundWords = [];
+            let startTime = new Date();
+            let timerInterval;
+            let isSelecting = false;
+            let selectionDirection = null;
+
+            // Elementos del DOM
+            const wordSearch = document.getElementById('wordSearch');
+            const wordList = document.getElementById('wordList');
+            const checkWordBtn = document.getElementById('checkWord');
+            const resetSelectionBtn = document.getElementById('resetSelection');
+            const solvePuzzleBtn = document.getElementById('solvePuzzle');
+            const newGameBtn = document.getElementById('newGame');
+            const playAgainBtn = document.getElementById('playAgain');
+            const messageDiv = document.getElementById('message');
+            const completionMessage = document.getElementById('completionMessage');
+            const completionTime = document.getElementById('completionTime');
+            const foundWordsElem = document.getElementById('foundWords');
+            const totalWordsElem = document.getElementById('totalWords');
+            const timeSpentElem = document.getElementById('timeSpent');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+            // Inicializar el juego
+            initGame();
+
+            // Función para inicializar el juego
+            function initGame() {
+                // Reiniciar estado del juego
+                selectedCells = [];
+                foundWords = [];
+                startTime = new Date();
+                wordPositions = {};
+
+                // Limpiar elementos existentes
+                wordSearch.innerHTML = '';
+                wordList.innerHTML = '';
+
+                // Configurar palabras según la dificultad
+                setupWordsByDifficulty();
+
+                // Inicializar la sopa de letras
+                initWordSearch();
+
+                // Inicializar la lista de palabras
+                initWordList();
+
+                // Actualizar contadores
+                foundWordsElem.textContent = foundWords.length;
+                totalWordsElem.textContent = words.length;
+
+                // Reiniciar temporizador
+                if (timerInterval) clearInterval(timerInterval);
+                startTimer();
+
+                // Ocultar mensaje de finalización
+                completionMessage.style.display = 'none';
+
+                // Habilitar botones
+                checkWordBtn.disabled = false;
+                solvePuzzleBtn.disabled = false;
+            }
+
+            // Configurar palabras según la dificultad
+            function setupWordsByDifficulty() {
+                const wordSets = {
+                    easy: ['BECA', 'OJO', 'YOYO', 'AJO', 'CARRO', 'GATO', 'PAJARO', 'HIELO', 'LUNA', 'SOL'],
+                    medium: ['BECA', 'OJO', 'YOYO', 'AJO', 'CARRO', 'GATO', 'PAJARO', 'HIELO', 'MONTAÑA', 'VOLCAN', 'ELEFANTE', 'JIRAFA'],
+                    hard: ['BECA', 'OJO', 'YOYO', 'AJO', 'CARRO', 'GATO', 'PAJARO', 'HIELO', 'MONTAÑA', 'VOLCAN', 'ELEFANTE', 'JIRAFA', 'OCEANO', 'CONTINENTE']
+                };
+
+                words = wordSets[currentDifficulty] || wordSets.easy;
+            }
+
+            // Función para inicializar la sopa de letras
+            function initWordSearch() {
+                // Crear matriz vacía
+                const grid = Array(rows).fill().map(() => Array(cols).fill(''));
+
+                // Colocar palabras en la matriz
+                placeWordsInGrid(grid);
+
+                // Rellenar espacios vacíos con letras aleatorias
+                fillEmptySpaces(grid);
+
+                // Crear la tabla
+                for (let i = 0; i < rows; i++) {
+                    const row = document.createElement('tr');
+
+                    for (let j = 0; j < cols; j++) {
+                        const cell = document.createElement('td');
+                        cell.textContent = grid[i][j];
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+
+                        // Agregar eventos para selección
+                        cell.addEventListener('mousedown', startSelection);
+                        cell.addEventListener('mouseover', continueSelection);
+                        cell.addEventListener('mouseup', endSelection);
+
+                        // Para dispositivos táctiles
+                        cell.addEventListener('touchstart', startSelectionTouch);
+                        cell.addEventListener('touchmove', continueSelectionTouch);
+                        cell.addEventListener('touchend', endSelection);
+
+                        row.appendChild(cell);
+                    }
+
+                    wordSearch.appendChild(row);
+                }
+            }
+
+            // Colocar palabras en la matriz
+            function placeWordsInGrid(grid) {
+                const directions = [
+                    [0, 1], // Derecha
+                    [1, 0], // Abajo
+                    [1, 1], // Diagonal derecha-abajo
+                    [1, -1], // Diagonal izquierda-abajo
+                    [0, -1], // Izquierda
+                    [-1, 0], // Arriba
+                    [-1, 1], // Diagonal derecha-arriba
+                    [-1, -1] // Diagonal izquierda-arriba
+                ];
+
+                words.forEach(word => {
+                    let placed = false;
+                    let attempts = 0;
+
+                    while (!placed && attempts < 100) {
+                        attempts++;
+
+                        // Elegir dirección aleatoria
+                        const direction = directions[Math.floor(Math.random() * directions.length)];
+                        const dx = direction[0];
+                        const dy = direction[1];
+
+                        // Elegir posición inicial aleatoria
+                        const startX = Math.floor(Math.random() * rows);
+                        const startY = Math.floor(Math.random() * cols);
+
+                        // Verificar si la palabra cabe en esa dirección
+                        const endX = startX + dx * (word.length - 1);
+                        const endY = startY + dy * (word.length - 1);
+
+                        if (endX < 0 || endX >= rows || endY < 0 || endY >= cols) {
+                            continue;
+                        }
+
+                        // Verificar que no haya conflictos con otras palabras
+                        let conflict = false;
+                        for (let i = 0; i < word.length; i++) {
+                            const x = startX + dx * i;
+                            const y = startY + dy * i;
+
+                            if (grid[x][y] !== '' && grid[x][y] !== word[i]) {
+                                conflict = true;
+                                break;
+                            }
+                        }
+
+                        if (conflict) continue;
+
+                        // Colocar la palabra
+                        const positions = [];
+                        for (let i = 0; i < word.length; i++) {
+                            const x = startX + dx * i;
+                            const y = startY + dy * i;
+
+                            grid[x][y] = word[i];
+                            positions.push({
+                                x,
+                                y
+                            });
+                        }
+
+                        // Guardar la posición de la palabra
+                        wordPositions[word] = positions;
+                        placed = true;
+                    }
+                });
+            }
+
+            // Rellenar espacios vacíos con letras aleatorias
+            function fillEmptySpaces(grid) {
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        if (grid[i][j] === '') {
+                            grid[i][j] = letters[Math.floor(Math.random() * letters.length)];
+                        }
+                    }
+                }
+            }
+
+            // Función para inicializar la lista de palabras
+            function initWordList() {
+                words.forEach(word => {
+                    const wordItem = document.createElement('div');
+                    wordItem.classList.add('word-item');
+                    wordItem.textContent = word;
+                    wordItem.id = `word-${word}`;
+                    wordList.appendChild(wordItem);
+                });
+            }
+
+            // Función para iniciar la selección (ratón)
+            function startSelection(e) {
+                e.preventDefault();
+                isSelecting = true;
+                selectionDirection = null;
+                resetSelection();
+
+                const cell = e.target.tagName === 'TD' ? e.target : e.target.closest('td');
+                if (cell) {
+                    selectCell(cell);
+                }
+            }
+
+            // Función para iniciar la selección (táctil)
+            function startSelectionTouch(e) {
+                e.preventDefault();
+                isSelecting = true;
+                selectionDirection = null;
+                resetSelection();
+
+                const touch = e.touches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                const cell = element && element.tagName === 'TD' ? element : element.closest('td');
+
+                if (cell) {
+                    selectCell(cell);
+                }
+            }
+
+            // Función para continuar la selección (ratón)
+            function continueSelection(e) {
+                if (!isSelecting) return;
+
+                const cell = e.target.tagName === 'TD' ? e.target : e.target.closest('td');
+                if (cell && !selectedCells.includes(cell)) {
+                    // Verificar dirección válida
+                    if (selectedCells.length > 0) {
+                        const lastCell = selectedCells[selectedCells.length - 1];
+                        const lastRow = parseInt(lastCell.dataset.row);
+                        const lastCol = parseInt(lastCell.dataset.col);
+                        const currentRow = parseInt(cell.dataset.row);
+                        const currentCol = parseInt(cell.dataset.col);
+
+                        const rowDiff = currentRow - lastRow;
+                        const colDiff = currentCol - lastCol;
+
+                        // Si es la segunda celda, establecer dirección
+                        if (selectedCells.length === 1) {
+                            selectionDirection = [rowDiff, colDiff];
+                        }
+
+                        // Verificar si la nueva celda sigue la dirección establecida
+                        if (selectionDirection &&
+                            (rowDiff !== selectionDirection[0] || colDiff !== selectionDirection[1])) {
+                            return; // No seguir si cambia la dirección
+                        }
+                    }
+
+                    selectCell(cell);
+                }
+            }
+
+            // Función para continuar la selección (táctil)
+            function continueSelectionTouch(e) {
+                if (!isSelecting) return;
+                e.preventDefault();
+
+                const touch = e.touches[0];
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                const cell = element && element.tagName === 'TD' ? element : element.closest('td');
+
+                if (cell && !selectedCells.includes(cell)) {
+                    // Verificar dirección válida (misma lógica que continueSelection)
+                    if (selectedCells.length > 0) {
+                        const lastCell = selectedCells[selectedCells.length - 1];
+                        const lastRow = parseInt(lastCell.dataset.row);
+                        const lastCol = parseInt(lastCell.dataset.col);
+                        const currentRow = parseInt(cell.dataset.row);
+                        const currentCol = parseInt(cell.dataset.col);
+
+                        const rowDiff = currentRow - lastRow;
+                        const colDiff = currentCol - lastCol;
+
+                        if (selectedCells.length === 1) {
+                            selectionDirection = [rowDiff, colDiff];
+                        }
+
+                        if (selectionDirection &&
+                            (rowDiff !== selectionDirection[0] || colDiff !== selectionDirection[1])) {
+                            return;
+                        }
+                    }
+
+                    selectCell(cell);
+                }
+            }
+
+            // Función para finalizar la selección
+            function endSelection() {
+                isSelecting = false;
+            }
+
+            // Función para seleccionar una celda
+            function selectCell(cell) {
+                cell.classList.add('selected');
+                selectedCells.push(cell);
+            }
+
+            // Función para reiniciar la selección
+            function resetSelection() {
+                selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                });
+                selectedCells = [];
+                selectionDirection = null;
+            }
+
+            // Evento para el botón de verificar palabra
+            checkWordBtn.addEventListener('click', function() {
+                if (selectedCells.length === 0) {
+                    showMessage('Por favor, selecciona una palabra primero.', 'error');
+                    return;
+                }
+
+                // Obtener la palabra seleccionada en ambos sentidos
+                const selectedWord = selectedCells.map(cell => cell.textContent).join('');
+                const reversedWord = selectedCells.map(cell => cell.textContent).reverse().join('');
+
+                // Verificar si la palabra está en la lista (en cualquier dirección)
+                let foundWord = null;
+                if (words.includes(selectedWord)) {
+                    foundWord = selectedWord;
+                } else if (words.includes(reversedWord)) {
+                    foundWord = reversedWord;
+                }
+
+                if (foundWord) {
+                    // Verificar si ya fue encontrada
+                    if (!foundWords.includes(foundWord)) {
+                        foundWords.push(foundWord);
+
+                        // Marcar las celdas como encontradas
+                        selectedCells.forEach(cell => {
+                            cell.classList.remove('selected');
+                            cell.classList.add('found');
+                            cell.classList.add('highlight-animation');
+
+                            // Remover la animación después de que termine
+                            setTimeout(() => {
+                                cell.classList.remove('highlight-animation');
+                            }, 1500);
+                        });
+
+                        // Marcar la palabra en la lista
+                        const wordElement = document.getElementById(`word-${foundWord}`);
+                        wordElement.classList.add('found');
+
+                        // Actualizar contador
+                        foundWordsElem.textContent = foundWords.length;
+
+                        showMessage(`¡Correcto! Encontraste la palabra "${foundWord}".`, 'success');
+
+                        // Verificar si se completó el juego
+                        if (foundWords.length === words.length) {
+                            completeGame();
+                        }
+                    } else {
+                        showMessage('Ya encontraste esta palabra.', 'error');
+                    }
+                } else {
+                    showMessage('La palabra seleccionada no es correcta. Intenta de nuevo.', 'error');
+                }
+
+                resetSelection();
+            });
+
+            // Función para completar el juego
+            function completeGame() {
+                clearInterval(timerInterval);
+
+                // Calcular tiempo final
+                const now = new Date();
+                const diff = Math.floor((now - startTime) / 1000);
+                const minutes = Math.floor(diff / 60);
+                const seconds = diff % 60;
+                completionTime.textContent =
+                    (minutes < 10 ? '0' : '') + minutes + ':' +
+                    (seconds < 10 ? '0' : '') + seconds;
+
+                // Mostrar mensaje de finalización
+                completionMessage.style.display = 'block';
+
+                // Deshabilitar botones
+                checkWordBtn.disabled = true;
+                solvePuzzleBtn.disabled = true;
+
+                showMessage('¡Felicidades! Has encontrado todas las palabras.', 'success');
+            }
+
+            // Evento para el botón de reiniciar selección
+            resetSelectionBtn.addEventListener('click', function() {
+                resetSelection();
+            });
+
+            // Evento para el botón de resolver sopa
+            solvePuzzleBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que quieres resolver la sopa de letras? Esto revelará todas las palabras.')) {
+                    // Marcar todas las palabras como encontradas
+                    words.forEach(word => {
+                        if (!foundWords.includes(word)) {
+                            foundWords.push(word);
+                            document.getElementById(`word-${word}`).classList.add('found');
+
+                            // Marcar las celdas de la palabra
+                            if (wordPositions[word]) {
+                                wordPositions[word].forEach(pos => {
+                                    const cell = document.querySelector(`td[data-row="${pos.x}"][data-col="${pos.y}"]`);
+                                    if (cell) {
+                                        cell.classList.add('found');
+                                        cell.classList.add('highlight-animation');
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    foundWordsElem.textContent = foundWords.length;
+                    completeGame();
+                }
+            });
+
+            // Evento para el botón de nuevo juego
+            newGameBtn.addEventListener('click', function() {
+                initGame();
+                showMessage('Nuevo juego iniciado.', 'success');
+            });
+
+            // Evento para el botón de jugar otra vez
+            playAgainBtn.addEventListener('click', function() {
+                initGame();
+                showMessage('Nuevo juego iniciado.', 'success');
+            });
+
+            // Eventos para los botones de dificultad
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Actualizar botones activos
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Cambiar dificultad
+                    currentDifficulty = this.dataset.difficulty;
+
+                    // Reiniciar juego con nueva dificultad
+                    initGame();
+                    showMessage(`Dificultad cambiada a ${this.textContent}.`, 'success');
+                });
+            });
+
+            // Función para mostrar mensajes
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            // Función para iniciar el temporizador
+            function startTimer() {
+                timerInterval = setInterval(function() {
+                    const now = new Date();
+                    const diff = Math.floor((now - startTime) / 1000);
+                    const minutes = Math.floor(diff / 60);
+                    const seconds = diff % 60;
+
+                    timeSpentElem.textContent =
+                        (minutes < 10 ? '0' : '') + minutes + ':' +
+                        (seconds < 10 ? '0' : '') + seconds;
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>

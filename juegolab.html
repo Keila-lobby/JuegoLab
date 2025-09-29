@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuegoLab - Plataforma Educativa</title>
+    <style>
+        /* Estilos generales */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Estilos del formulario de registro */
+        
+        .register-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            transition: transform 0.3s ease;
+        }
+        
+        .register-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .register-title {
+            color: #7b68ee;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #7b68ee;
+            box-shadow: 0 0 0 2px rgba(123, 104, 238, 0.2);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        .grado-section {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f5ff;
+            border-radius: 8px;
+            border-left: 4px solid #7b68ee;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .form-footer a {
+            color: #7b68ee;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .message {
+            display: none;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        /* Estilos de la página JuegoLab */
+        
+        .juegolab-page {
+            display: none;
+        }
+        
+        header {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .welcome-section {
+            text-align: center;
+            padding: 40px 0;
+            background: white;
+            margin: 20px auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+        }
+        
+        .welcome-section h1 {
+            color: #7b68ee;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .welcome-section p {
+            color: #666;
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .games-section {
+            padding: 30px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            color: #7b68ee;
+            margin-bottom: 30px;
+            font-size: 28px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-image {
+            height: 160px;
+            background: linear-gradient(135deg, #7b68ee, #98fb98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+        
+        .game-content {
+            padding: 20px;
+        }
+        
+        .game-title {
+            font-size: 20px;
+            color: #7b68ee;
+            margin-bottom: 10px;
+        }
+        
+        .game-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .play-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        footer {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .footer-links a {
+                margin: 0 10px;
+            }
+        }
+        /* Animaciones */
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .game-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .game-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        
+        .game-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+        
+        .game-card:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+        
+        .game-card:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+        
+        .game-card:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .btn-submit:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Página de registro -->
+    <div id="registerPage" class="register-page">
+        <div class="register-container">
+            <h1 class="register-title">Crear Cuenta</h1>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="nombres">Nombres Completos</label>
+                    <input type="text" id="nombres" name="nombres" required placeholder="Ingresa tu nombre completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo Institucional</label>
+                    <input type="email" id="correo" name="correo" required placeholder="ejemplo@institucion.edu">
+                </div>
+
+                <div class="form-group">
+                    <label for="rol">Rol</label>
+                    <select id="rol" name="rol" required>
+                        <option value="">Seleccione un rol</option>
+                        <option value="estudiante">Estudiante</option>
+                        <option value="maestro">Maestro</option>
+                        <option value="director">Director</option>
+                    </select>
+                </div>
+
+                <div id="gradoSection" class="grado-section">
+                    <div class="form-group">
+                        <label for="grado">Grado</label>
+                        <select id="grado" name="grado">
+                            <option value="">Seleccione un grado</option>
+                            <option value="kinder">Kinder</option>
+                            <option value="1">1° Grado</option>
+                            <option value="2">2° Grado</option>
+                            <option value="3">3° Grado</option>
+                            <option value="4">4° Grado</option>
+                            <option value="5">5° Grado</option>
+                            <option value="6">6° Grado</option>
+                            <option value="7">7° Grado</option>
+                            <option value="8">8° Grado</option>
+                            <option value="9">9° Grado</option>
+                            <option value="1-bachillerato-general">1° Año Bachillerato General</option>
+                            <option value="2-bachillerato-general">2° Año Bachillerato General</option>
+                            <option value="1-bachillerato-tecnico">1° Año Bachillerato Técnico</option>
+                            <option value="2-bachillerato-tecnico">2° Año Bachillerato Técnico</option>
+                            <option value="3-bachillerato-tecnico">3° Año Bachillerato Técnico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="message" class="message"></div>
+
+                <button type="submit" class="btn-submit">Crear Cuenta</button>
+            </form>
+
+            <div class="form-footer">
+                ¿Ya tienes una cuenta? <a href="#" id="loginLink">Inicia sesión aquí</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página JuegoLab -->
+    <div id="juegolabPage" class="juegolab-page">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <span class="logo-icon">🎮</span>
+                        <span>JuegoLab</span>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <span id="userName">Usuario</span>
+                        <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <section class="welcome-section">
+                <h1>¡Bienvenido a JuegoLab!</h1>
+                <p>Explora nuestra colección de juegos educativos diseñados para hacer el aprendizaje divertido y efectivo. Selecciona un juego para comenzar.</p>
+            </section>
+
+            <section class="games-section">
+                <h2 class="section-title">Juegos Disponibles</h2>
+
+                <div class="games-grid">
+                    <!-- Juego Simón Dice -->
+                    <div class="game-card">
+                        <div class="game-image">🎮</div>
+                        <div class="game-content">
+                            <h3 class="game-title">Simón Dice</h3>
+                            <p class="game-description">Juego de memoria clásico donde debes repetir secuencias de colores y sonidos cada vez más largas.</p>
+                            <div class="game-meta">
+                                <span>Memoria</span>
+                                <span>Nivel: Básico</span>
+                            </div>
+                            <a href="simondice.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+
+                    <!-- Juego Sopa de Letras -->
+                    <div class="game-card">
+                        <div class="game-image">🔤</div>
+                        <div class="game-content">
+                            <h3 class="game-title">Sopa de Letras</h3>
+                            <p class="game-description">Encuentra palabras escondidas en una cuadrícula de letras. ¡Aumenta tu vocabulario mientras te diviertes!</p>
+                            <div class="game-meta">
+                                <span>Palabras</span>
+                                <span>Nivel: Intermedio</span>
+                            </div>
+                            <a href="sopa.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+
+                    <!-- Juego Ahorcado -->
+                    <div class="game-card">
+                        <div class="game-image">💀</div>
+                        <div class="game-content">
+                            <h3 class="game-title">Ahorcado</h3>
+                            <p class="game-description">Adivina la palabra letra por letra antes de que se complete el dibujo del ahorcado.</p>
+                            <div class="game-meta">
+                                <span>Adivinanza</span>
+                                <span>Nivel: Intermedio</span>
+                            </div>
+                            <a href="ahorcado.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+
+                    <!-- Juego Tarjetas -->
+                    <div class="game-card">
+                        <div class="game-image">🃏</div>
+                        <div class="game-content">
+                            <h3 class="game-title">Tarjetas de Memoria</h3>
+                            <p class="game-description">Encuentra las parejas de cartas iguales volteándolas de dos en dos. ¡Pon a prueba tu memoria!</p>
+                            <div class="game-meta">
+                                <span>Memoria</span>
+                                <span>Nivel: Básico</span>
+                            </div>
+                            <a href="tarjetas.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+
+                    <!-- Nuevo juego: Búsqueda del Conejo -->
+                    <div class="game-card">
+                        <div class="game-image">🐰</div>
+                        <div class="game-content">
+                            <h3 class="game-title">Búsqueda del Conejo</h3>
+                            <p class="game-description">Ayuda a encontrar al conejo escondido en diferentes escenarios. ¡Desarrolla tu atención y observación!</p>
+                            <div class="game-meta">
+                                <span>Observación</span>
+                                <span>Nivel: Básico</span>
+                            </div>
+                            <a href="bunny.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+
+                    <!-- Nuevo juego: ¡BINGO! -->
+                    <div class="game-card">
+                        <div class="game-image">🎯</div>
+                        <div class="game-content">
+                            <h3 class="game-title">¡BINGO!</h3>
+                            <p class="game-description">Juega al clásico juego de Bingo con números y letras. ¡Perfecto para practicar reconocimiento de patrones!</p>
+                            <div class="game-meta">
+                                <span>Números</span>
+                                <span>Nivel: Todos</span>
+                            </div>
+                            <a href="bingo.html" class="play-btn">Jugar Ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="copyright">
+                        &copy; 2023 JuegoLab - Plataforma de Juegos Educativos
+                    </div>
+                    <div class="footer-links">
+                        <a href="#">Términos de uso</a>
+                        <a href="#">Política de privacidad</a>
+                        <a href="#">Contacto</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos del DOM
+            const registerPage = document.getElementById('registerPage');
+            const juegolabPage = document.getElementById('juegolabPage');
+            const registerForm = document.getElementById('registerForm');
+            const rolSelect = document.getElementById('rol');
+            const gradoSection = document.getElementById('gradoSection');
+            const gradoSelect = document.getElementById('grado');
+            const messageDiv = document.getElementById('message');
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginLink = document.getElementById('loginLink');
+
+            // Verificar si ya hay una sesión activa
+            checkSession();
+
+            // Mostrar u ocultar la sección de grado según el rol seleccionado
+            rolSelect.addEventListener('change', function() {
+                if (this.value === 'estudiante') {
+                    gradoSection.style.display = 'block';
+                    gradoSelect.required = true;
+                } else {
+                    gradoSection.style.display = 'none';
+                    gradoSelect.required = false;
+                }
+            });
+
+            // Manejar el envío del formulario
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validación básica
+                const nombres = document.getElementById('nombres').value.trim();
+                const correo = document.getElementById('correo').value.trim();
+                const rol = document.getElementById('rol').value;
+
+                if (!nombres || !correo || !rol) {
+                    showMessage('Por favor, complete todos los campos obligatorios.', 'error');
+                    return;
+                }
+
+                if (rol === 'estudiante' && !gradoSelect.value) {
+                    showMessage('Por favor, seleccione un grado.', 'error');
+                    return;
+                }
+
+                // Guardar datos de usuario
+                saveUserData(nombres, correo, rol, gradoSelect.value);
+
+                // Simular envío exitoso
+                showMessage('¡Cuenta creada exitosamente! Redirigiendo a JuegoLab...', 'success');
+
+                // Redirigir después de 2 segundos
+                setTimeout(function() {
+                    showJuegolabPage();
+                }, 2000);
+            });
+
+            // Función para mostrar mensajes
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+
+                // Ocultar mensaje después de 5 segundos (solo para errores)
+                if (type === 'error') {
+                    setTimeout(function() {
+                        messageDiv.style.display = 'none';
+                    }, 5000);
+                }
+            }
+
+            // Función para guardar datos del usuario
+            function saveUserData(nombres, correo, rol, grado) {
+                localStorage.setItem('userName', nombres);
+                localStorage.setItem('userEmail', correo);
+                localStorage.setItem('userRol', rol);
+                localStorage.setItem('userGrado', grado);
+            }
+
+            // Función para verificar si hay una sesión activa
+            function checkSession() {
+                const savedName = localStorage.getItem('userName');
+                if (savedName) {
+                    showJuegolabPage();
+                } else {
+                    showRegisterPage();
+                }
+            }
+
+            // Función para mostrar la página de JuegoLab
+            function showJuegolabPage() {
+                registerPage.style.display = 'none';
+                juegolabPage.style.display = 'block';
+
+                // Actualizar información del usuario
+                const savedName = localStorage.getItem('userName');
+                const savedRol = localStorage.getItem('userRol');
+                const savedGrado = localStorage.getItem('userGrado');
+
+                if (savedName) {
+                    userName.textContent = savedName;
+                    userAvatar.textContent = savedName.charAt(0).toUpperCase();
+
+                    // Personalizar mensaje de bienvenida según el rol
+                    const welcomeTitle = document.querySelector('.welcome-section h1');
+                    if (savedRol === 'estudiante') {
+                        welcomeTitle.textContent = `¡Bienvenido/a, ${savedName}! - Grado: ${getGradoText(savedGrado)}`;
+                    } else {
+                        welcomeTitle.textContent = `¡Bienvenido/a, ${savedName} (${savedRol})!`;
+                    }
+                }
+
+                // Agregar funcionalidad a los botones de juego
+                const playButtons = document.querySelectorAll('.play-btn');
+                playButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        // Permitir que el enlace funcione normalmente
+                        console.log(`Iniciando juego: ${this.closest('.game-card').querySelector('.game-title').textContent}`);
+                    });
+                });
+            }
+
+            // Función para mostrar la página de registro
+            function showRegisterPage() {
+                registerPage.style.display = 'flex';
+                juegolabPage.style.display = 'none';
+            }
+
+            // Función para obtener el texto del grado
+            function getGradoText(gradoValue) {
+                const grados = {
+                    'kinder': 'Kinder',
+                    '1': '1° Grado',
+                    '2': '2° Grado',
+                    '3': '3° Grado',
+                    '4': '4° Grado',
+                    '5': '5° Grado',
+                    '6': '6° Grado',
+                    '7': '7° Grado',
+                    '8': '8° Grado',
+                    '9': '9° Grado',
+                    '1-bachillerato-general': '1° Año Bachillerato General',
+                    '2-bachillerato-general': '2° Año Bachillerato General',
+                    '1-bachillerato-tecnico': '1° Año Bachillerato Técnico',
+                    '2-bachillerato-tecnico': '2° Año Bachillerato Técnico',
+                    '3-bachillerato-tecnico': '3° Año Bachillerato Técnico'
+                };
+
+                return grados[gradoValue] || 'No especificado';
+            }
+
+            // Función para cerrar sesión
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    // Limpiar datos de usuario
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userRol');
+                    localStorage.removeItem('userGrado');
+
+                    // Redirigir al formulario de registro
+                    showRegisterPage();
+                }
+            });
+
+            // Enlace de inicio de sesión (simulación)
+            loginLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Funcionalidad de inicio de sesión no implementada en esta demo.');
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Educativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .grade-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .grade-btn {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .grade-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .grade-btn.active {
+            background: #7b68ee;
+            color: white;
+            border-color: #7b68ee;
+        }
+        
+        .difficulty-info {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #7b68ee;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .bingo-cell {
+            background-color: white;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .bingo-cell.free {
+            background-color: #98fb98;
+            font-weight: bold;
+        }
+        
+        .bingo-cell.marked {
+            background-color: #ffcccb;
+            text-decoration: line-through;
+        }
+        
+        .bingo-cell.bingo {
+            background-color: #FFD700;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .called-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .called-number {
+            width: 50px;
+            height: 50px;
+            background-color: #7b68ee;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .called-number.recent {
+            background-color: #FF6B6B;
+            animation: highlight 1s;
+        }
+        
+        @keyframes highlight {
+            0% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .bingo-patterns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .pattern {
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pattern.active {
+            background-color: #7b68ee;
+            color: white;
+        }
+        
+        .win-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .win-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .bingo-card {
+                max-width: 400px;
+            }
+            .bingo-cell {
+                font-size: 16px;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .bingo-card {
+                max-width: 300px;
+            }
+            .bingo-cell {
+                font-size: 14px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Pantalla de selección de grado -->
+        <div id="grade-screen" class="screen active">
+            <header>
+                <h1>Bingo Educativo</h1>
+                <h2>Selecciona tu grado académico</h2>
+                <h3>La dificultad se ajustará según tu nivel</h3>
+            </header>
+
+            <div class="instructions">
+                <p>Selecciona tu grado académico para jugar al bingo educativo. Cada grado tiene diferentes niveles de dificultad:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Kínder:</strong> Números del 1-25, patrones simples</li>
+                    <li><strong>Primaria:</strong> Números del 1-50, operaciones matemáticas básicas</li>
+                    <li><strong>Secundaria:</strong> Números del 1-75, operaciones matemáticas intermedias</li>
+                    <li><strong>Bachillerato:</strong> Números del 1-90, operaciones matemáticas avanzadas</li>
+                </ul>
+            </div>
+
+            <div class="grade-selector">
+                <button class="grade-btn active" data-grade="kinder">Kínder</button>
+                <button class="grade-btn" data-grade="primaria">Primaria</button>
+                <button class="grade-btn" data-grade="secundaria">Secundaria</button>
+                <button class="grade-btn" data-grade="bachillerato">Bachillerato</button>
+            </div>
+
+            <div class="difficulty-info" id="difficulty-info">
+                Nivel: Kínder - Números del 1 al 25, patrones simples
+            </div>
+
+            <div class="controls">
+                <button id="start-btn"><i class="fas fa-play"></i> Comenzar Juego</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+            </div>
+        </div>
+
+        <!-- Pantalla de juego -->
+        <div id="game-screen" class="screen">
+            <header>
+                <h1>Bingo Educativo</h1>
+                <h2 id="grade-title">Kínder</h2>
+                <h3 id="pattern-info">Patrón: Línea Horizontal</h3>
+            </header>
+
+            <div class="instructions">
+                <p>Marca los números que se van llamando. ¡Grita BINGO cuando completes el patrón!</p>
+            </div>
+
+            <div class="bingo-patterns">
+                <div class="pattern active" data-pattern="horizontal">Línea Horizontal</div>
+                <div class="pattern" data-pattern="vertical">Línea Vertical</div>
+                <div class="pattern" data-pattern="diagonal">Diagonal</div>
+                <div class="pattern" data-pattern="four-corners">Cuatro Esquinas</div>
+                <div class="pattern" data-pattern="full-card">Cartón Lleno</div>
+            </div>
+
+            <div class="game-area">
+                <div class="bingo-card" id="bingo-card">
+                    <!-- Las celdas del bingo se generarán aquí -->
+                </div>
+
+                <div class="called-numbers" id="called-numbers">
+                    <!-- Los números llamados aparecerán aquí -->
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="numbers-called">0</div>
+                    <div>Números Llamados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="marked-count">0</div>
+                    <div>Números Marcados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time">00:00</div>
+                    <div>Tiempo</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="call-btn"><i class="fas fa-bullhorn"></i> Llamar Número</button>
+                <button id="bingo-btn" disabled><i class="fas fa-trophy"></i> ¡BINGO!</button>
+                <button id="restart-btn"><i class="fas fa-redo"></i> Reiniciar</button>
+                <button id="back-to-menu-btn"><i class="fas fa-arrow-left"></i> Volver</button>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="win-message" id="win-message">
+                <h3><i class="fas fa-trophy"></i> ¡Felicidades! ¡BINGO!</h3>
+                <p>Has completado el patrón en <span id="win-time">0</span> segundos</p>
+                <p>Números llamados: <span id="win-numbers">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de dificultad por grado
+        const difficultySettings = {
+            kinder: {
+                name: "Kínder",
+                maxNumber: 25,
+                patterns: ["horizontal", "vertical", "diagonal", "four-corners"],
+                cardSize: 5,
+                freeCenter: true,
+                operations: false
+            },
+            primaria: {
+                name: "Primaria",
+                maxNumber: 50,
+                patterns: ["horizontal", "vertical", "diagonal", "four-corners", "full-card"],
+                cardSize: 5,
+                freeCenter: true,
+                operations: "basic" // Sumas y restas simples
+            },
+            secundaria: {
+                name: "Secundaria",
+                maxNumber: 75,
+                patterns: ["horizontal", "vertical", "diagonal", "four-corners", "full-card"],
+                cardSize: 5,
+                freeCenter: true,
+                operations: "intermediate" // Multiplicaciones y divisiones
+            },
+            bachillerato: {
+                name: "Bachillerato",
+                maxNumber: 90,
+                patterns: ["horizontal", "vertical", "diagonal", "four-corners", "full-card"],
+                cardSize: 5,
+                freeCenter: true,
+                operations: "advanced" // Operaciones más complejas
+            }
+        };
+
+        // Variables del juego
+        let selectedGrade = 'kinder';
+        let currentDifficulty = difficultySettings[selectedGrade];
+        let bingoCard = [];
+        let calledNumbers = [];
+        let gameTime = 0;
+        let timer;
+        let gameStarted = false;
+        let currentPattern = 'horizontal';
+        let winConditionMet = false;
+
+        // Elementos DOM
+        const gradeScreen = document.getElementById('grade-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const difficultyInfo = document.getElementById('difficulty-info');
+        const gradeTitle = document.getElementById('grade-title');
+        const patternInfo = document.getElementById('pattern-info');
+        const bingoCardElement = document.getElementById('bingo-card');
+        const calledNumbersElement = document.getElementById('called-numbers');
+        const numbersCalledDisplay = document.getElementById('numbers-called');
+        const markedCountDisplay = document.getElementById('marked-count');
+        const timeDisplay = document.getElementById('time');
+        const callBtn = document.getElementById('call-btn');
+        const bingoBtn = document.getElementById('bingo-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const startBtn = document.getElementById('start-btn');
+        const messageDiv = document.getElementById('message');
+        const winMessage = document.getElementById('win-message');
+        const winTime = document.getElementById('win-time');
+        const winNumbers = document.getElementById('win-numbers');
+        const patternElements = document.querySelectorAll('.pattern');
+
+        // Inicializar el juego
+        function initGame() {
+            // Agregar event listeners a los botones de grado
+            const gradeButtons = document.querySelectorAll('.grade-btn');
+            gradeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    gradeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    selectedGrade = button.dataset.grade;
+                    currentDifficulty = difficultySettings[selectedGrade];
+                    updateDifficultyInfo();
+                });
+            });
+
+            // Agregar event listeners a los patrones
+            patternElements.forEach(pattern => {
+                pattern.addEventListener('click', () => {
+                    if (gameStarted) return; // No cambiar patrón durante el juego
+
+                    patternElements.forEach(p => p.classList.remove('active'));
+                    pattern.classList.add('active');
+                    currentPattern = pattern.dataset.pattern;
+                    patternInfo.textContent = `Patrón: ${getPatternName(currentPattern)}`;
+                });
+            });
+
+            // Botones de control
+            startBtn.addEventListener('click', startGame);
+            callBtn.addEventListener('click', callNumber);
+            bingoBtn.addEventListener('click', checkBingo);
+            restartBtn.addEventListener('click', restartGame);
+            backToMenuBtn.addEventListener('click', showGradeScreen);
+
+            // Actualizar información de dificultad inicial
+            updateDifficultyInfo();
+        }
+
+        // Actualizar información de dificultad
+        function updateDifficultyInfo() {
+            const infoText = `Nivel: ${currentDifficulty.name} - Números del 1 al ${currentDifficulty.maxNumber}`;
+            difficultyInfo.textContent = infoText;
+            gradeTitle.textContent = currentDifficulty.name;
+        }
+
+        // Obtener nombre del patrón
+        function getPatternName(pattern) {
+            const names = {
+                'horizontal': 'Línea Horizontal',
+                'vertical': 'Línea Vertical',
+                'diagonal': 'Diagonal',
+                'four-corners': 'Cuatro Esquinas',
+                'full-card': 'Cartón Lleno'
+            };
+            return names[pattern] || pattern;
+        }
+
+        // Comenzar el juego
+        function startGame() {
+            // Cambiar a pantalla de juego
+            gradeScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+
+            // Reiniciar variables del juego
+            calledNumbers = [];
+            gameTime = 0;
+            gameStarted = true;
+            winConditionMet = false;
+
+            // Actualizar contadores
+            numbersCalledDisplay.textContent = calledNumbers.length;
+            markedCountDisplay.textContent = 0;
+            timeDisplay.textContent = formatTime(gameTime);
+
+            // Crear cartón de bingo
+            createBingoCard();
+
+            // Actualizar números llamados
+            updateCalledNumbers();
+
+            // Iniciar temporizador
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (gameStarted && !winConditionMet) {
+                    gameTime++;
+                    timeDisplay.textContent = formatTime(gameTime);
+                }
+            }, 1000);
+
+            // Actualizar patrón
+            patternInfo.textContent = `Patrón: ${getPatternName(currentPattern)}`;
+
+            // Ocultar mensaje de victoria
+            winMessage.style.display = 'none';
+
+            showMessage('¡El juego ha comenzado! Haz clic en "Llamar Número" para empezar.', 'success');
+        }
+
+        // Crear cartón de bingo
+        function createBingoCard() {
+            // Limpiar cartón
+            bingoCardElement.innerHTML = '';
+            bingoCard = [];
+
+            // Generar números únicos para el cartón
+            const numbers = [];
+            const maxNumber = currentDifficulty.maxNumber;
+            const cardSize = currentDifficulty.cardSize;
+            const totalCells = cardSize * cardSize;
+
+            // Generar números aleatorios únicos
+            while (numbers.length < totalCells) {
+                const randomNum = Math.floor(Math.random() * maxNumber) + 1;
+                if (!numbers.includes(randomNum)) {
+                    numbers.push(randomNum);
+                }
+            }
+
+            // Crear matriz del cartón
+            for (let i = 0; i < cardSize; i++) {
+                const row = [];
+                for (let j = 0; j < cardSize; j++) {
+                    const index = i * cardSize + j;
+                    const number = numbers[index];
+                    row.push(number);
+                }
+                bingoCard.push(row);
+            }
+
+            // Hacer el centro gratis si está configurado
+            if (currentDifficulty.freeCenter) {
+                const center = Math.floor(cardSize / 2);
+                bingoCard[center][center] = 'FREE';
+            }
+
+            // Crear elementos del cartón
+            for (let i = 0; i < cardSize; i++) {
+                for (let j = 0; j < cardSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'bingo-cell';
+
+                    // Celda gratuita en el centro
+                    if (i === Math.floor(cardSize / 2) && j === Math.floor(cardSize / 2) && currentDifficulty.freeCenter) {
+                        cell.textContent = 'FREE';
+                        cell.classList.add('free');
+                        cell.dataset.marked = 'true';
+                    } else {
+                        cell.textContent = bingoCard[i][j];
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+                        cell.dataset.marked = 'false';
+
+                        // Agregar evento de clic para marcar/desmarcar
+                        cell.addEventListener('click', () => toggleMark(cell));
+                    }
+
+                    bingoCardElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Marcar/desmarcar celda
+        function toggleMark(cell) {
+            if (!gameStarted || winConditionMet) return;
+
+            const marked = cell.dataset.marked === 'true';
+
+            if (!marked) {
+                cell.classList.add('marked');
+                cell.dataset.marked = 'true';
+            } else {
+                cell.classList.remove('marked');
+                cell.dataset.marked = 'false';
+            }
+
+            // Actualizar contador de celdas marcadas
+            updateMarkedCount();
+
+            // Verificar si se puede gritar BINGO
+            checkBingoButton();
+        }
+
+        // Actualizar contador de celdas marcadas
+        function updateMarkedCount() {
+            const markedCells = document.querySelectorAll('.bingo-cell[data-marked="true"]');
+            markedCountDisplay.textContent = markedCells.length;
+        }
+
+        // Llamar número
+        function callNumber() {
+            if (!gameStarted || winConditionMet) return;
+
+            const maxNumber = currentDifficulty.maxNumber;
+            let newNumber;
+
+            // Generar número que no haya sido llamado
+            do {
+                newNumber = Math.floor(Math.random() * maxNumber) + 1;
+            } while (calledNumbers.includes(newNumber));
+
+            // Agregar a la lista de números llamados
+            calledNumbers.push(newNumber);
+            numbersCalledDisplay.textContent = calledNumbers.length;
+
+            // Actualizar visualización de números llamados
+            updateCalledNumbers();
+
+            // Verificar si el número está en el cartón
+            checkNumberInCard(newNumber);
+
+            // Verificar si se puede gritar BINGO
+            checkBingoButton();
+
+            showMessage(`Número llamado: ${newNumber}`, 'success');
+        }
+
+        // Actualizar números llamados
+        function updateCalledNumbers() {
+            calledNumbersElement.innerHTML = '';
+
+            calledNumbers.forEach((number, index) => {
+                const numberElement = document.createElement('div');
+                numberElement.className = 'called-number';
+                if (index === calledNumbers.length - 1) {
+                    numberElement.classList.add('recent');
+                }
+                numberElement.textContent = number;
+                calledNumbersElement.appendChild(numberElement);
+            });
+        }
+
+        // Verificar si el número llamado está en el cartón
+        function checkNumberInCard(number) {
+            const cells = document.querySelectorAll('.bingo-cell:not(.free)');
+
+            cells.forEach(cell => {
+                if (parseInt(cell.textContent) === number) {
+                    cell.classList.add('marked');
+                    cell.dataset.marked = 'true';
+                    updateMarkedCount();
+                }
+            });
+        }
+
+        // Verificar si se puede gritar BINGO
+        function checkBingoButton() {
+            const canBingo = checkWinCondition();
+            bingoBtn.disabled = !canBingo;
+        }
+
+        // Verificar condición de victoria
+        function checkWinCondition() {
+            const cardSize = currentDifficulty.cardSize;
+            const markedCells = document.querySelectorAll('.bingo-cell[data-marked="true"]');
+
+            // Convertir a matriz para facilitar la verificación
+            const markedMatrix = [];
+            for (let i = 0; i < cardSize; i++) {
+                markedMatrix[i] = [];
+                for (let j = 0; j < cardSize; j++) {
+                    const cell = document.querySelector(`.bingo-cell[data-row="${i}"][data-col="${j}"]`);
+                    markedMatrix[i][j] = cell ? cell.dataset.marked === 'true' : true; // FREE siempre está marcado
+                }
+            }
+
+            // Verificar según el patrón seleccionado
+            switch (currentPattern) {
+                case 'horizontal':
+                    return checkHorizontal(markedMatrix);
+                case 'vertical':
+                    return checkVertical(markedMatrix);
+                case 'diagonal':
+                    return checkDiagonal(markedMatrix);
+                case 'four-corners':
+                    return checkFourCorners(markedMatrix);
+                case 'full-card':
+                    return checkFullCard(markedMatrix);
+                default:
+                    return false;
+            }
+        }
+
+        // Verificar líneas horizontales
+        function checkHorizontal(markedMatrix) {
+            const cardSize = markedMatrix.length;
+            for (let i = 0; i < cardSize; i++) {
+                let complete = true;
+                for (let j = 0; j < cardSize; j++) {
+                    if (!markedMatrix[i][j]) {
+                        complete = false;
+                        break;
+                    }
+                }
+                if (complete) return true;
+            }
+            return false;
+        }
+
+        // Verificar líneas verticales
+        function checkVertical(markedMatrix) {
+            const cardSize = markedMatrix.length;
+            for (let j = 0; j < cardSize; j++) {
+                let complete = true;
+                for (let i = 0; i < cardSize; i++) {
+                    if (!markedMatrix[i][j]) {
+                        complete = false;
+                        break;
+                    }
+                }
+                if (complete) return true;
+            }
+            return false;
+        }
+
+        // Verificar diagonales
+        function checkDiagonal(markedMatrix) {
+            const cardSize = markedMatrix.length;
+            let diagonal1 = true;
+            let diagonal2 = true;
+
+            for (let i = 0; i < cardSize; i++) {
+                if (!markedMatrix[i][i]) diagonal1 = false;
+                if (!markedMatrix[i][cardSize - 1 - i]) diagonal2 = false;
+            }
+
+            return diagonal1 || diagonal2;
+        }
+
+        // Verificar cuatro esquinas
+        function checkFourCorners(markedMatrix) {
+            const cardSize = markedMatrix.length;
+            return markedMatrix[0][0] &&
+                markedMatrix[0][cardSize - 1] &&
+                markedMatrix[cardSize - 1][0] &&
+                markedMatrix[cardSize - 1][cardSize - 1];
+        }
+
+        // Verificar cartón lleno
+        function checkFullCard(markedMatrix) {
+            const cardSize = markedMatrix.length;
+            for (let i = 0; i < cardSize; i++) {
+                for (let j = 0; j < cardSize; j++) {
+                    if (!markedMatrix[i][j]) return false;
+                }
+            }
+            return true;
+        }
+
+        // Verificar BINGO
+        function checkBingo() {
+            if (!checkWinCondition()) {
+                showMessage('¡Aún no tienes BINGO! Sigue jugando.', 'error');
+                return;
+            }
+
+            // ¡BINGO!
+            winConditionMet = true;
+            gameStarted = false;
+            clearInterval(timer);
+
+            // Mostrar mensaje de victoria
+            winTime.textContent = gameTime;
+            winNumbers.textContent = calledNumbers.length;
+            winMessage.style.display = 'block';
+
+            // Resaltar celdas ganadoras
+            highlightWinningCells();
+
+            showMessage('¡Felicidades! ¡Has ganado!', 'success');
+        }
+
+        // Resaltar celdas ganadoras
+        function highlightWinningCells() {
+            const cells = document.querySelectorAll('.bingo-cell');
+            cells.forEach(cell => {
+                if (cell.dataset.marked === 'true') {
+                    cell.classList.add('bingo');
+                }
+            });
+        }
+
+        // Reiniciar juego
+        function restartGame() {
+            // Detener temporizador
+            clearInterval(timer);
+            gameStarted = false;
+            winConditionMet = false;
+
+            // Reiniciar juego
+            startGame();
+        }
+
+        // Mostrar pantalla de selección de grado
+        function showGradeScreen() {
+            clearInterval(timer);
+            gameScreen.classList.remove('active');
+            gradeScreen.classList.add('active');
+        }
+
+        // Formatear tiempo (segundos a MM:SS)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+
+            // Ocultar mensaje después de 3 segundos
+            setTimeout(function() {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Iniciar el juego cuando se carga la página
+        window.onload = initGame;
+    </script>
+</body>
+
+</html>

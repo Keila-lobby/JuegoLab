@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Cards - Juego de Memoria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .theme-btn {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        .theme-btn.animales {
+            background: linear-gradient(to right, #FF9A8B, #FF6A88);
+        }
+        
+        .theme-btn.idiomas {
+            background: linear-gradient(to right, #6A82FB, #FC5C7D);
+        }
+        
+        .theme-btn.numeros {
+            background: linear-gradient(to right, #42E695, #3BB2B8);
+        }
+        
+        .theme-btn.planetas {
+            background: linear-gradient(to right, #FFE53B, #FF2525);
+        }
+        
+        .grade-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .grade-btn {
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .grade-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .grade-btn.active {
+            background: #7b68ee;
+            color: white;
+            border-color: #7b68ee;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            width: 120px;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-front {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            font-size: 48px;
+        }
+        
+        .card-back {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+            padding: 10px;
+            flex-direction: column;
+        }
+        
+        .card.matched .card-back {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+        }
+        
+        .text-content {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .text-content small {
+            font-size: 14px;
+            font-weight: normal;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .rewards {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .reward {
+            font-size: 30px;
+            color: #ddd;
+            transition: color 0.3s;
+        }
+        
+        .reward.earned {
+            color: #FFD700;
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .completion-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .completion-message p {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .stats-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-name {
+            font-weight: bold;
+        }
+        
+        .achievements {
+            margin: 20px 0;
+        }
+        
+        .achievement {
+            display: flex;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .achievement.earned {
+            opacity: 1;
+            background: linear-gradient(to right, #e0f7e9, #f0e6f5);
+        }
+        
+        .achievement-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #7b68ee;
+        }
+        
+        .achievement-title {
+            font-weight: bold;
+        }
+        
+        .achievement-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .difficulty-info {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        @media (max-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .card {
+                width: 100px;
+                height: 130px;
+            }
+            .card-front {
+                font-size: 36px;
+            }
+            .text-content {
+                font-size: 16px;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+            .theme-btn {
+                min-width: 150px;
+                padding: 12px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .card {
+                width: 90px;
+                height: 120px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            .theme-btn {
+                min-width: 130px;
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+        }
+        
+        .highlight-animation {
+            animation: highlight 1.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Pantalla de selección de tema -->
+        <div id="theme-screen" class="screen active">
+            <header>
+                <h1>Juego de Memoria</h1>
+                <h2>Instrucciones</h2>
+                <h3>Encuentra las parejas de cartas iguales para ganar</h3>
+            </header>
+
+            <div class="instructions">
+                <p>Selecciona tu grado académico y un tema para jugar. Voltea dos cartas a la vez para encontrar las parejas. ¡Intenta completar el juego con la menor cantidad de movimientos y en el menor tiempo posible!</p>
+
+                <div class="difficulty-info" id="difficulty-info">
+                    La dificultad se ajustará automáticamente según tu grado académico
+                </div>
+
+                <div class="grade-selector">
+                    <button class="grade-btn active" data-grade="kinder">Kínder</button>
+                    <button class="grade-btn" data-grade="primaria">Primaria</button>
+                    <button class="grade-btn" data-grade="secundaria">Secundaria</button>
+                    <button class="grade-btn" data-grade="bachillerato">Bachillerato</button>
+                </div>
+            </div>
+
+            <div class="theme-selector">
+                <button class="theme-btn animales" data-theme="animales">
+                    <i class="fas fa-paw"></i> Animales
+                </button>
+                <button class="theme-btn idiomas" data-theme="idiomas">
+                    <i class="fas fa-language"></i> Idiomas
+                </button>
+                <button class="theme-btn numeros" data-theme="numeros">
+                    <i class="fas fa-calculator"></i> Números
+                </button>
+                <button class="theme-btn planetas" data-theme="planetas">
+                    <i class="fas fa-globe"></i> Planetas
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="best-time">--</div>
+                    <div>Mejor Tiempo</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="best-moves">--</div>
+                    <div>Mejores Movimientos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="games-played">0</div>
+                    <div>Juegos Completados</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+            </div>
+        </div>
+
+        <!-- Pantalla de juego -->
+        <div id="game-screen" class="screen">
+            <header>
+                <h1>Juego de Memoria</h1>
+                <h2 id="theme-title">Selecciona un tema</h2>
+                <h3 id="difficulty-display">Dificultad: Kínder</h3>
+            </header>
+
+            <div class="instructions">
+                <p>Voltea dos cartas a la vez para encontrar las parejas. ¡Intenta completar el juego con la menor cantidad de movimientos!</p>
+            </div>
+
+            <div class="rewards">
+                <div class="reward" id="reward-1">★</div>
+                <div class="reward" id="reward-2">★</div>
+                <div class="reward" id="reward-3">★</div>
+                <div class="reward" id="reward-4">★</div>
+                <div class="reward" id="reward-5">★</div>
+            </div>
+
+            <div class="game-area">
+                <div class="game-board" id="game-board">
+                    <!-- Las tarjetas se generarán aquí mediante JavaScript -->
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="move-count">0</div>
+                    <div>Movimientos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time">00:00</div>
+                    <div>Tiempo</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pairs">0/8</div>
+                    <div>Parejas</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="pause-btn"><i class="fas fa-pause"></i> Pausar</button>
+                <button id="restart-btn"><i class="fas fa-redo"></i> Reiniciar</button>
+                <button id="back-btn"><i class="fas fa-arrow-left"></i> Volver</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+
+        <!-- Pantalla de resultados -->
+        <div id="result-screen" class="screen">
+            <header>
+                <h1><i class="fas fa-trophy"></i> ¡Felicidades!</h1>
+                <h2>Has completado el juego</h2>
+            </header>
+
+            <div class="completion-message">
+                <h3>¡Juego Completado!</h3>
+                <p>Has encontrado todas las parejas en <span id="stat-time">0</span> segundos</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-row">
+                    <span class="stat-name">Tema:</span>
+                    <span class="stat-value" id="stat-theme">Animales</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Dificultad:</span>
+                    <span class="stat-value" id="stat-difficulty">Kínder</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Movimientos:</span>
+                    <span class="stat-value" id="stat-moves">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Tiempo:</span>
+                    <span class="stat-value" id="stat-time-result">0</span> segundos
+                </div>
+                <div class="stat-row">
+                    <span class="stat-name">Estrellas ganadas:</span>
+                    <span class="stat-value" id="stat-stars">0</span>
+                </div>
+            </div>
+
+            <div class="achievements">
+                <h3>Logros Desbloqueados</h3>
+                <div class="achievement" id="achievement-fast">
+                    <div class="achievement-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">Velocidad relámpago</div>
+                        <div class="achievement-desc">Completa el juego en menos de 60 segundos</div>
+                    </div>
+                </div>
+                <div class="achievement" id="achievement-perfect">
+                    <div class="achievement-icon"><i class="fas fa-star"></i></div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">Juego perfecto</div>
+                        <div class="achievement-desc">Encuentra todas las parejas en menos de 20 movimientos</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="play-again-btn"><i class="fas fa-play"></i> Jugar de Nuevo</button>
+                <button id="menu-btn"><i class="fas fa-home"></i> Menú Principal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos para los diferentes temas
+        const themes = {
+            animales: [{
+                id: 1,
+                name: "León",
+                emoji: "🦁"
+
+            }, {id: 2,
+                name: "Elefante",
+                emoji: "🐘"
+            }, {
+                id: 3,
+                name: "Tigre",
+                emoji: "🐯"
+            }, {
+                id: 4,
+                name: "Jirafa",
+                emoji: "🦒"
+            }, {
+                id: 5,
+                name: "Mono",
+                emoji: "🐵"
+            }, {
+                id: 6,
+                name: "Cebra",
+                emoji: "🦓"
+            }, {
+                id: 7,
+                name: "Oso",
+                emoji: "🐻"
+            }, {
+                id: 8,
+                name: "Lobo",
+                emoji: "🐺"
+            }],
+            idiomas: [{
+                id: 1,
+                name: "Hola",
+                translation: "Hello",
+                language: "Inglés"
+            }, {
+                id: 2,
+                name: "Adiós",
+                translation: "Goodbye",
+                language: "Inglés"
+            }, {
+                id: 3,
+                name: "Gracias",
+                translation: "Thank you",
+                language: "Inglés"
+            }, {
+                id: 4,
+                name: "Por favor",
+                translation: "Please",
+                language: "Inglés"
+            }, {
+                id: 5,
+                name: "Buenos días",
+                translation: "Good morning",
+                language: "Inglés"
+            }, {
+                id: 6,
+                name: "Buenas noches",
+                translation: "Good night",
+                language: "Inglés"
+            }, {
+                id: 7,
+                name: "¿Cómo estás?",
+                translation: "How are you?",
+                language: "Inglés"
+            }, {
+                id: 8,
+                name: "Te quiero",
+                translation: "I love you",
+                language: "Inglés"
+            }],
+            numeros: [{
+                id: 1,
+                number: "1",
+                word: "Uno"
+            }, {
+                id: 2,
+                number: "2",
+                word: "Dos"
+            }, {
+                id: 3,
+                number: "3",
+                word: "Tres"
+            }, {
+                id: 4,
+                number: "4",
+                word: "Cuatro"
+            }, {
+                id: 5,
+                number: "5",
+                word: "Cinco"
+            }, {
+                id: 6,
+                number: "6",
+                word: "Seis"
+            }, {
+                id: 7,
+                number: "7",
+                word: "Siete"
+            }, {
+                id: 8,
+                number: "8",
+                word: "Ocho"
+            }],
+            planetas: [{
+                id: 1,
+                name: "Mercurio",
+                fact: "El planeta más cercano al Sol"
+            }, {
+                id: 2,
+                name: "Venus",
+                fact: "El planeta más caliente"
+            }, {
+                id: 3,
+                name: "Tierra",
+                fact: "Nuestro hogar"
+            }, {
+                id: 4,
+                name: "Marte",
+                fact: "El planeta rojo"
+            }, {
+                id: 5,
+                name: "Júpiter",
+                fact: "El planeta más grande"
+            }, {
+                id: 6,
+                name: "Saturno",
+                fact: "Famoso por sus anillos"
+            }, {
+                id: 7,
+                name: "Urano",
+                fact: "Planeta inclinado"
+            }, {
+                id: 8,
+                name: "Neptuno",
+                fact: "Planeta más ventoso"
+            }]
+        };
+
+        // Configuración de dificultad por grado
+        const difficultySettings = {
+            kinder: {
+                name: "Kínder (Súper Fácil)",
+                pairs: 6, // Menos parejas
+                previewTime: 3000, // Más tiempo de vista previa
+                gridColumns: 3, // Grid más pequeño
+                gridRows: 2
+            },
+            primaria: {
+                name: "Primaria (Fácil)",
+                pairs: 8, // Cantidad estándar
+                previewTime: 2000, // Tiempo moderado de vista previa
+                gridColumns: 4,
+                gridRows: 2
+            },
+            secundaria: {
+                name: "Secundaria (Medio)",
+                pairs: 10, // Más parejas
+                previewTime: 1500, // Menos tiempo de vista previa
+                gridColumns: 5,
+                gridRows: 2
+            },
+            bachillerato: {
+                name: "Bachillerato (Difícil)",
+                pairs: 12, // Máximo de parejas
+                previewTime: 1000, // Mínimo tiempo de vista previa
+                gridColumns: 4,
+                gridRows: 3
+            }
+        };
+
+        // Variables del juego
+        let selectedTheme = '';
+        let selectedGrade = 'kinder';
+        let currentDifficulty = difficultySettings[selectedGrade];
+        let cards = [];
+        let flippedCards = [];
+        let moveCount = 0;
+        let matchedPairs = 0;
+        let gameTime = 0;
+        let timer;
+        let gameStarted = false;
+        let stars = 0;
+        let gamePaused = false;
+        let gamesPlayed = 0;
+        let bestTime = null;
+        let bestMoves = null;
+
+        // Elementos DOM
+        const themeScreen = document.getElementById('theme-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const gradeButtons = document.querySelectorAll('.grade-btn');
+        const themeTitle = document.getElementById('theme-title');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const difficultyInfo = document.getElementById('difficulty-info');
+        const gameBoard = document.getElementById('game-board');
+        const moveCountDisplay = document.getElementById('move-count');
+        const timeDisplay = document.getElementById('time');
+        const pairsDisplay = document.getElementById('pairs');
+
+        const restartBtn = document.getElementById('restart-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const backBtn = document.getElementById('back-btn');
+
+        const statTheme = document.getElementById('stat-theme');
+        const statDifficulty = document.getElementById('stat-difficulty');
+        const statMoves = document.getElementById('stat-moves');
+        const statTime = document.getElementById('stat-time-result');
+        const statStars = document.getElementById('stat-stars');
+
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const menuBtn = document.getElementById('menu-btn');
+
+        const rewardElements = [
+            document.getElementById('reward-1'),
+            document.getElementById('reward-2'),
+            document.getElementById('reward-3'),
+            document.getElementById('reward-4'),
+            document.getElementById('reward-5')
+        ];
+
+        const bestTimeDisplay = document.getElementById('best-time');
+        const bestMovesDisplay = document.getElementById('best-moves');
+        const gamesPlayedDisplay = document.getElementById('games-played');
+        const messageDiv = document.getElementById('message');
+
+        // Inicializar el juego
+        function initGame() {
+            // Cargar estadísticas guardadas
+            loadStats();
+
+            // Agregar event listeners a los botones de tema
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    selectedTheme = button.dataset.theme;
+                    startGame();
+                });
+            });
+
+            // Agregar event listeners a los botones de grado
+            gradeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    gradeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    selectedGrade = button.dataset.grade;
+                    currentDifficulty = difficultySettings[selectedGrade];
+                    updateDifficultyInfo();
+                });
+            });
+
+            // Botones de control
+            restartBtn.addEventListener('click', resetGame);
+            pauseBtn.addEventListener('click', togglePause);
+            backBtn.addEventListener('click', showThemeScreen);
+            playAgainBtn.addEventListener('click', playAgain);
+            menuBtn.addEventListener('click', showThemeScreen);
+
+            // Actualizar información de dificultad inicial
+            updateDifficultyInfo();
+        }
+
+        // Actualizar información de dificultad
+        function updateDifficultyInfo() {
+            difficultyInfo.textContent = `Dificultad: ${currentDifficulty.name} - ${currentDifficulty.pairs} parejas`;
+            difficultyDisplay.textContent = `Dificultad: ${currentDifficulty.name}`;
+        }
+
+        // Cargar estadísticas
+        function loadStats() {
+            const savedStats = localStorage.getItem('memoryGameStats');
+            if (savedStats) {
+                const stats = JSON.parse(savedStats);
+                gamesPlayed = stats.gamesPlayed || 0;
+                bestTime = stats.bestTime || null;
+                bestMoves = stats.bestMoves || null;
+            }
+
+            updateStatsDisplay();
+        }
+
+        // Guardar estadísticas
+        function saveStats() {
+            const stats = {
+                gamesPlayed: gamesPlayed,
+                bestTime: bestTime,
+                bestMoves: bestMoves
+            };
+            localStorage.setItem('memoryGameStats', JSON.stringify(stats));
+        }
+
+        // Actualizar visualización de estadísticas
+        function updateStatsDisplay() {
+            gamesPlayedDisplay.textContent = gamesPlayed;
+            bestTimeDisplay.textContent = bestTime ? formatTime(bestTime) : "--";
+            bestMovesDisplay.textContent = bestMoves || "--";
+        }
+
+        // Formatear tiempo (segundos a MM:SS)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Comenzar el juego
+        function startGame() {
+            // Cambiar a pantalla de juego
+            themeScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            resultScreen.classList.remove('active');
+
+            // Configurar el título según el tema
+            const themeNames = {
+                animales: "Animales",
+                idiomas: "Idiomas",
+                numeros: "Números",
+                planetas: "Planetas"
+            };
+            themeTitle.textContent = `Memoria - ${themeNames[selectedTheme]}`;
+
+            // Reiniciar variables del juego
+            flippedCards = [];
+            moveCount = 0;
+            matchedPairs = 0;
+            gameTime = 0;
+            stars = 0;
+            gameStarted = true;
+            gamePaused = false;
+
+            // Actualizar contadores
+            moveCountDisplay.textContent = moveCount;
+            timeDisplay.textContent = formatTime(gameTime);
+            pairsDisplay.textContent = `${matchedPairs}/${currentDifficulty.pairs}`;
+
+            // Reiniciar estrellas
+            rewardElements.forEach(reward => {
+                reward.classList.remove('earned');
+            });
+
+            // Crear y mezclar las cartas
+            createCards();
+
+            // Iniciar temporizador
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if (gameStarted && !gamePaused) {
+                    gameTime++;
+                    timeDisplay.textContent = formatTime(gameTime);
+
+                    // Otorgar estrellas basadas en el tiempo
+                    updateStars();
+                }
+            }, 1000);
+
+            showMessage('¡El juego ha comenzado! Encuentra todas las parejas.', 'success');
+        }
+
+        // Crear las cartas para el juego
+        function createCards() {
+            // Limpiar tablero
+            gameBoard.innerHTML = '';
+
+            // Ajustar grid según la dificultad
+            gameBoard.style.gridTemplateColumns = `repeat(${currentDifficulty.gridColumns}, 1fr)`;
+
+            // Obtener datos del tema seleccionado
+            const themeData = themes[selectedTheme];
+
+            // Tomar solo el número de pares según la dificultad
+            const selectedPairs = themeData.slice(0, currentDifficulty.pairs);
+
+            // Duplicar y mezclar las cartas
+            cards = [...selectedPairs, ...selectedPairs];
+            shuffleArray(cards);
+
+            // Crear elementos de cartas
+            cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.dataset.index = index;
+                cardElement.dataset.id = card.id;
+
+                const cardInner = document.createElement('div');
+                cardInner.className = 'card-inner';
+
+                // Contenido frontal (parte trasera de la carta)
+                const cardFront = document.createElement('div');
+                cardFront.className = 'card-front';
+                cardFront.innerHTML = '<i class="fas fa-question"></i>';
+
+                // Contenido trasero (parte frontal de la carta)
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-back';
+
+                // Diferente contenido según el tema
+                switch (selectedTheme) {
+                    case 'animales':
+                        cardBack.innerHTML = `<div class="text-content">${card.name}<br><span style="font-size: 24px;">${card.emoji}</span></div>`;
+                        break;
+                    case 'idiomas':
+                        cardBack.innerHTML = `<div class="text-content">${card.translation}<br><small>${card.language}</small></div>`;
+                        break;
+                    case 'numeros':
+                        cardBack.innerHTML = `<div class="text-content">${card.number}<br><small>${card.word}</small></div>`;
+                        break;
+                    case 'planetas':
+                        cardBack.innerHTML = `<div class="text-content">${card.name}<br><small>${card.fact}</small></div>`;
+                        break;
+                }
+
+                cardInner.appendChild(cardFront);
+                cardInner.appendChild(cardBack);
+                cardElement.appendChild(cardInner);
+
+                // Event listener para voltear la carta
+                cardElement.addEventListener('click', () => flipCard(cardElement));
+
+                gameBoard.appendChild(cardElement);
+            });
+
+            // Mostrar vista previa según la dificultad
+            showCardPreview();
+        }
+
+        // Mostrar vista previa de las cartas
+        function showCardPreview() {
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                card.classList.add('flipped');
+            });
+
+            setTimeout(() => {
+                allCards.forEach(card => {
+                    card.classList.remove('flipped');
+                });
+                gameStarted = true;
+            }, currentDifficulty.previewTime);
+        }
+
+        // Voltear una carta
+        function flipCard(card) {
+            // No hacer nada si el juego está pausado, la carta ya está volteada o si ya hay dos cartas volteadas
+            if (!gameStarted || gamePaused || card.classList.contains('flipped') || card.classList.contains('matched') || flippedCards.length >= 2) {
+                return;
+            }
+
+            // Voltear la carta
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            // Si tenemos dos cartas volteadas, verificar si hacen pareja
+            if (flippedCards.length === 2) {
+                moveCount++;
+                moveCountDisplay.textContent = moveCount;
+
+                setTimeout(checkMatch, 700);
+            }
+        }
+
+        // Verificar si las cartas volteadas hacen pareja
+        function checkMatch() {
+            const card1 = flippedCards[0];
+            const card2 = flippedCards[1];
+
+            // Comprobar si las cartas tienen el mismo ID
+            if (card1.dataset.id === card2.dataset.id) {
+                // Son pareja
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                pairsDisplay.textContent = `${matchedPairs}/${currentDifficulty.pairs}`;
+
+                // Animación de éxito
+                card1.querySelector('.card-back').classList.add('highlight-animation');
+                card2.querySelector('.card-back').classList.add('highlight-animation');
+
+                setTimeout(() => {
+                    card1.querySelector('.card-back').classList.remove('highlight-animation');
+                    card2.querySelector('.card-back').classList.remove('highlight-animation');
+                }, 1500);
+
+                // Comprobar si el juego está completo
+                if (matchedPairs === currentDifficulty.pairs) {
+                    endGame();
+                }
+            } else {
+                // No son pareja, voltear de nuevo
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 1000);
+            }
+
+            // Reiniciar array de cartas volteadas
+            flippedCards = [];
+        }
+
+        // Actualizar estrellas ganadas
+        function updateStars() {
+            let newStars = 0;
+
+            // Estrella por comenzar el juego
+            if (gameTime > 0) newStars = Math.max(1, newStars);
+
+            // Estrella por encontrar al menos 25% de parejas
+            if (matchedPairs >= currentDifficulty.pairs * 0.25) newStars = Math.max(2, newStars);
+
+            // Estrella por encontrar al menos 50% de parejas
+            if (matchedPairs >= currentDifficulty.pairs * 0.5) newStars = Math.max(3, newStars);
+
+            // Estrella por encontrar al menos 75% de parejas
+            if (matchedPairs >= currentDifficulty.pairs * 0.75) newStars = Math.max(4, newStars);
+
+            // Estrella por completar el juego
+            if (matchedPairs === currentDifficulty.pairs) newStars = 5;
+
+            // Actualizar estrellas si hay cambios
+            if (newStars > stars) {
+                stars = newStars;
+                for (let i = 0; i < stars; i++) {
+                    rewardElements[i].classList.add('earned');
+                }
+            }
+        }
+
+        // Finalizar el juego
+        function endGame() {
+            gameStarted = false;
+            clearInterval(timer);
+
+            // Actualizar estadísticas
+            gamesPlayed++;
+
+            // Verificar si es el mejor tiempo
+            if (!bestTime || gameTime < bestTime) {
+                bestTime = gameTime;
+            }
+
+            // Verificar si es la menor cantidad de movimientos
+            if (!bestMoves || moveCount < bestMoves) {
+                bestMoves = moveCount;
+            }
+
+            // Guardar estadísticas
+            saveStats();
+            updateStatsDisplay();
+
+            // Actualizar pantalla de resultados
+            const themeNames = {
+                animales: "Animales",
+                idiomas: "Idiomas",
+                numeros: "Números",
+                planetas: "Planetas"
+            };
+
+            statTheme.textContent = themeNames[selectedTheme];
+            statDifficulty.textContent = currentDifficulty.name;
+            statMoves.textContent = moveCount;
+            statTime.textContent = gameTime;
+            statStars.textContent = stars;
+
+            // Verificar logros
+            if (gameTime < 60) {
+                document.getElementById('achievement-fast').classList.add('earned');
+            }
+
+            if (moveCount <= currentDifficulty.pairs * 1.5) { // Ajustado según número de parejas
+                document.getElementById('achievement-perfect').classList.add('earned');
+            }
+
+            // Mostrar pantalla de resultados después de un breve retraso
+            setTimeout(() => {
+                gameScreen.classList.remove('active');
+                resultScreen.classList.add('active');
+            }, 1500);
+        }
+
+        // Reiniciar el juego
+        function resetGame() {
+            // Detener temporizador
+            clearInterval(timer);
+            gameStarted = false;
+
+            // Reiniciar juego
+            startGame();
+        }
+
+        // Pausar/reanudar el juego
+        function togglePause() {
+            gamePaused = !gamePaused;
+
+            if (gamePaused) {
+                pauseBtn.innerHTML = '<i class="fas fa-play"></i> Reanudar';
+                pauseBtn.style.background = 'linear-gradient(to right, #2ecc71, #27ae60)';
+                showMessage('Juego en pausa', 'success');
+            } else {
+                pauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+                pauseBtn.style.background = 'linear-gradient(to right, #7b68ee, #98fb98)';
+                showMessage('Juego reanudado', 'success');
+            }
+        }
+
+        // Jugar again
+        function playAgain() {
+            resultScreen.classList.remove('active');
+            resetGame();
+        }
+
+        // Mostrar pantalla de selección de tema
+        function showThemeScreen() {
+            clearInterval(timer);
+            gameScreen.classList.remove('active');
+            resultScreen.classList.remove('active');
+            themeScreen.classList.add('active');
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+
+            // Ocultar mensaje después de 3 segundos
+            setTimeout(function() {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Función para mezclar array (algoritmo Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Iniciar el juego cuando se carga la página
+        window.onload = initGame;
+    </script>
+</body>
+
+</html>
