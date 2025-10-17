@@ -326,20 +326,40 @@
                 background-color: #98fb98;
             }
         }
-        .collapse {
-        &:not(.show) {
-            display: none;}
-        }
-
+        
         .collapse-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-        .collapse-content.open {
-        padding: 15px;
-        max-height: 500px; /* Ajusta según contenido */
-        }
+    .collapse-item {
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .collapse-header {
+      background-color: #f0f0f0;
+      padding: 15px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+    }
+
+    .collapse-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      background-color: #fafafa;
+      padding: 0 15px;
+    }
+
+    .collapse-content.open {
+      padding: 15px;
+      max-height: 500px; /* Ajusta según contenido */
+    }
+        
     </style>
 </head>
 
@@ -350,32 +370,24 @@
             <h2>Simón dice</h2>
         </header>
 
-        <div class="instructions">
-            <div class="difficulty">
-                <button class="difficulty-btn collapse-container" data-bs-toggle="collapse" role="button" 
-                aria-expanded="false" aria-controls="CollapseExample1">Reglas</button>
-                <button class="difficulty-btn collapse-container" data-bs-toggle="collapse" data-bs-target="#CollapseExample2" 
-                aria-expanded="false" aria-controls="CollapseExample2">Controles</button>
-            </div>
-            
+        <div class="collapse-container difficulty">
+        <div class="collapse-item">
+        <div class="collapse-header difficulty-btn">Reglas</div>
+        <div class="collapse-content">
+            <p>Simón mostrara en pantalla lo que dice y debes hacerlo, ten cuidado porque es un poco travieso. Solo debes obedecer si la orden comienza con "Simón dice...".</p>
         </div>
-            <div class="row">
-            <div class="col">
-                <div class="collapse multi-collapse" id="CollapseExample1">
-                <div class="card card-body">
-                    Debes de hacer lo que Simón diga, pero ten cuidado en las dificultades altas (puede volverse engañoso). 
-                </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="collapse multi-collapse" id="CollapseExample2">
-                <div class="card card-body">
-                    Presiona el boton que se muestre en el texto de Simón, debes tener buenos reflejos 
-                    ya que dependiendo de la dificultad sera el tiempo limite para darle al boton.
-                </div>
-                </div>
-            </div>
-            </div>
+        </div>
+
+        <div class="collapse-item">
+        <div class="collapse-header difficulty-btn">Controles</div>
+        <div class="collapse-content">
+            <p>Tendras varios botones en la pantalla que indican las acciones a realizar, si te equivocas, perderás puntos. 
+                ¡Presta mucha atención!</p>
+        </div>
+        </div>
+        </div>
+        <div class="instructions">
+            <img src="img/Simon.png" alt="">
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
