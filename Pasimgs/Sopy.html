@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indicaciones para Sopa de letras</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7e9, #f0e6f5);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #7b68ee;
+        }
+        
+        h1 {
+            color: #7b68ee;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #5a4fcf;
+            margin-bottom: 15px;
+        }
+        
+        h3 {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+        
+        .instructions {
+            background-color: #f9f5ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #7b68ee;
+        }
+        
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .word-item {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .word-item.found {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .word-item.found::after {
+            content: "✓";
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .word-search {
+            margin-bottom: 20px;
+            overflow: auto;
+            max-width: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        td {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+        }
+        
+        td.selected {
+            background-color: #7b68ee;
+            color: white;
+        }
+        
+        td.found {
+            background-color: #98fb98;
+            color: #2e7d32;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(to right, #7b68ee, #98fb98);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 160px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 104, 238, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #e6f7e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b68ee;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #7b68ee;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 10px 20px;
+            border: 1px solid #7b68ee;
+            border-radius: 5px;
+        }
+        
+        .back-btn:hover {
+            color: #5a4fcf;
+            background-color: #f5f3ff;
+        }
+        
+        .difficulty {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .difficulty-selector {
+            display: inline-flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn:hover {
+            background: #7b68ee;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            td {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            .word-list {
+                justify-content: center;
+            }
+            button {
+                min-width: 140px;
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            td {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                min-width: 120px;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7e9, #d4edda);
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .completion-message h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .completion-message p {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-animation {
+            animation: highlight 1.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% {
+                background-color: #98fb98;
+            }
+            50% {
+                background-color: #7b68ee;
+            }
+            100% {
+                background-color: #98fb98;
+            }
+        }
+        
+        .collapse-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .collapse-item {
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .collapse-header {
+      background-color: #f0f0f0;
+      padding: 15px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: bold;
+    }
+
+    .collapse-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      background-color: #fafafa;
+      padding: 0 15px;
+    }
+
+    .collapse-content.open {
+      padding: 15px;
+      max-height: 500px; /* Ajusta según contenido */
+    }
+     
+    img {
+        display: block;
+        margin: auto;
+        border-radius: 5px;
+        border: #ccc solid;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Como jugar...</h1>
+            <h2>Sopa de letras</h2>
+        </header>
+        
+        <div class="collapse-container difficulty">
+        <div class="collapse-item">
+        <div class="collapse-header difficulty-btn">Reglas</div>
+        <div class="collapse-content">
+            <p>Encuentra las palabras esparcidas en el cuadro de letras.</p>
+        </div>
+        </div>
+
+        <div class="collapse-item">
+        <div class="collapse-header difficulty-btn">Controles</div>
+        <div class="collapse-content">
+            <p>Tendras varios botones en la pantalla que indican las acciones a realizar, si te equivocas, perderás puntos. 
+                ¡Veamos cuan aguda es tu vista!</p>
+        </div>
+        </div>
+        </div>
+        <div class="instructions">
+            <img src="simi.png" alt="" height="500" width="650" border="1">        
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="../sopa.html"><button id="checkWord">¡A jugar!</button></a>
+            <br><a href="../juegolab.html" class="back-btn">← Volver a JuegoLab</a>
+        </div>
+    </div>
+
+    <script>             
+        const headers = document.querySelectorAll('.collapse-header');
+
+        headers.forEach(header => {
+        header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        content.classList.toggle('open');
+      });
+    });
+    </script>
+</body>
+
+</html>
